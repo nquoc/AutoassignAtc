@@ -1,0 +1,214 @@
+{
+  "system_info": {
+    "name": "Hệ thống điều phối data ATC - CS Hồ Chí Minh & Đồng Nai",
+    "version": "2.1",
+    "updated_at": "2026-11-01T17:28:00+07:00",
+    "layout_architecture": {
+      "block_1_provinces": "Dòng 2 đến trước Vũng Tàu (Cần Thơ, Cà Mau, Gia Lai, Lâm Đồng...)",
+      "block_2_vung_tau_fixed": "Cố định ở trên: 4 phường Vũng Tàu (Tam Thắng, Vũng Tàu, Rạch Dừa, Phước Thắng - 8484 ANH Nam)",
+      "block_3_dong_nai_fixed": "Cố định ở trên: 9 phường/xã Đồng Nai (8437 - Nguyễn Đoàn Hưng Phát)",
+      "block_4_hcm_personnel_dynamic": "Biến động hàng ngày: Bắt đầu ngay sau khối Đồng Nai, chỉ cập nhật từ dòng này trở xuống!"
+    },
+    "sheets": {
+      "target_sheet_id": "18UEFDLWpagQ7tBmZN9zMZsoVPzp4QuyzpvJ2tW2qsuE",
+      "target_worksheet": "Miền Nam",
+      "source_sheet_id": "12jMmPTNYapo_eK-UcSLVPXkDo6ljquCJ6dqYjru8Il0",
+      "source_worksheet": "Sheet1"
+    }
+  },
+  "tier_rules": {
+    "tier_0": {
+      "range": "<= 5",
+      "action": "FULL_PRIMARY_AND_ALL_BACKUP"
+    },
+    "tier_1": {
+      "range": "> 5 AND < 10",
+      "action": "FULL_PRIMARY_AND_BOLD_BACKUP"
+    },
+    "tier_2": {
+      "range": ">= 10 AND < 15",
+      "action": "FULL_PRIMARY"
+    },
+    "tier_3": {
+      "range": ">= 15 AND < 22",
+      "action": "BOLD_PRIMARY_OR_FIRST_3_IF_ALL_BOLD"
+    },
+    "tier_4": {
+      "range": ">= 22",
+      "action": "SUSPEND"
+    }
+  },
+  "special_fixed_blocks": {
+    "vung_tau": {
+      "city": "Hồ Chí Minh",
+      "assignee": "Vũng Tàu - 8484 ANH Nam",
+      "wards": ["Tam Thắng", "Vũng Tàu", "Rạch Dừa", "Phước Thắng"]
+    },
+    "dong_nai": {
+      "city": "Đồng Nai",
+      "assignee": "8437 - Nguyễn Đoàn Hưng Phát",
+      "wards": [
+        "Biên Hòa", "Hố Nai", "Trấn Biên", "Tam Hiệp", "Trảng Bom",
+        "Trảng Dài", "Long Bình", "Tân Triều", "Bình Minh"
+      ]
+    }
+  },
+  "personnel": {
+    "8437": {
+      "code": "8437",
+      "name": "Nguyễn Đoàn Hưng Phát",
+      "full_name": "8437 - Nguyễn Đoàn Hưng Phát - Customer Success - SGN",
+      "city": "Đồng Nai",
+      "area": "TP.Biên Hoà, Trảng Bom",
+      "primary_wards": [
+        {"name": "Hố Nai", "is_bold": true},
+        {"name": "Trấn Biên", "is_bold": true},
+        {"name": "Tam Hiệp", "is_bold": true},
+        {"name": "Trảng Bom", "is_bold": true},
+        {"name": "Bình Minh", "is_bold": true},
+        {"name": "Biên Hòa", "is_bold": true},
+        {"name": "Trảng Dài", "is_bold": false},
+        {"name": "Long Bình", "is_bold": false},
+        {"name": "Tân Triều", "is_bold": false}
+      ],
+      "backup_wards": [
+        {"name": "Thủ Đức", "is_bold": true},
+        {"name": "Linh Xuân", "is_bold": true},
+        {"name": "Tăng Nhơn Phú", "is_bold": true},
+        {"name": "Long Bình", "is_bold": true}
+      ]
+    },
+    "8231": {
+      "code": "8231",
+      "name": "Thượng Thái Hiếu",
+      "full_name": "8231 - Thượng Thái Hiếu - Customer Success - SGN",
+      "city": "Hồ Chí Minh",
+      "area": "Thủ Đức, Q9",
+      "primary_wards": [
+        {"name": "Hiệp Bình", "is_bold": true},
+        {"name": "Thủ Đức", "is_bold": true},
+        {"name": "Tam Bình", "is_bold": true},
+        {"name": "Linh Xuân", "is_bold": true},
+        {"name": "Tăng Nhơn Phú", "is_bold": true},
+        {"name": "Long Bình", "is_bold": true}
+      ],
+      "backup_wards": [
+        {"name": "Bình Trưng", "is_bold": true},
+        {"name": "Phước Long", "is_bold": true},
+        {"name": "An Khánh", "is_bold": true},
+        {"name": "Dĩ An", "is_bold": false},
+        {"name": "Đông Hòa", "is_bold": false}
+      ]
+    },
+    "8447": {
+      "code": "8447",
+      "name": "Võ Khánh Duy",
+      "full_name": "8447 - Võ Khánh Duy - Customer Success - SGN",
+      "city": "Hồ Chí Minh",
+      "area": "Tân Phú",
+      "primary_wards": [
+        {"name": "Phú Thạnh", "is_bold": true},
+        {"name": "Tây Thạnh", "is_bold": true},
+        {"name": "Tân Sơn Nhì", "is_bold": true},
+        {"name": "Phú Thọ Hòa", "is_bold": true},
+        {"name": "Tân Phú", "is_bold": true}
+      ],
+      "backup_wards": [
+        {"name": "An Lạc", "is_bold": true},
+        {"name": "Bình Trị Đông", "is_bold": true},
+        {"name": "Bình Hưng Hòa", "is_bold": true},
+        {"name": "Bình Tân", "is_bold": true},
+        {"name": "Tân Tạo", "is_bold": false}
+      ]
+    },
+    "8440": {
+      "code": "8440",
+      "name": "Doãn Việt Tùng",
+      "full_name": "8440 - Doãn Việt Tùng - Customer Success - SGN",
+      "city": "Hồ Chí Minh",
+      "area": "Gò Vấp",
+      "primary_wards": [
+        {"name": "Hạnh Thông", "is_bold": true},
+        {"name": "Gò Vấp", "is_bold": true},
+        {"name": "An Hội Đông", "is_bold": true},
+        {"name": "Thông Tây Hội", "is_bold": true},
+        {"name": "An Hội Tây", "is_bold": true}
+      ],
+      "backup_wards": [
+        {"name": "Bình Thạnh", "is_bold": true},
+        {"name": "Bình Lợi Trung", "is_bold": true},
+        {"name": "Thới An", "is_bold": true},
+        {"name": "An Phú Đông", "is_bold": true},
+        {"name": "Gia Định", "is_bold": false},
+        {"name": "Thạnh Mỹ Tây", "is_bold": false}
+      ]
+    },
+    "8448": {
+      "code": "8448",
+      "name": "Nguyễn Đỗ Nhật Minh",
+      "full_name": "8448 - Nguyễn Đỗ Nhật Minh - Customer Success - SGN",
+      "city": "Hồ Chí Minh",
+      "area": "Bình Thạnh",
+      "primary_wards": [
+        {"name": "Gia Định", "is_bold": true},
+        {"name": "Bình Thạnh", "is_bold": true},
+        {"name": "Thạnh Mỹ Tây", "is_bold": true},
+        {"name": "Cầu Kiệu", "is_bold": false},
+        {"name": "Phú Nhuận", "is_bold": false},
+        {"name": "Đức Nhuận", "is_bold": false}
+      ],
+      "backup_wards": [
+        {"name": "An Khánh", "is_bold": true},
+        {"name": "Cầu Kiệu", "is_bold": true},
+        {"name": "Phú Nhuận", "is_bold": true},
+        {"name": "Bình Quới", "is_bold": true},
+        {"name": "Bình Lợi Trung", "is_bold": true}
+      ]
+    },
+    "8467": {
+      "code": "8467",
+      "name": "Nguyễn Thành Đạt",
+      "full_name": "8467 - Nguyễn Thành Đạt - Customer Success - SGN",
+      "city": "Hồ Chí Minh",
+      "area": "Quận 11",
+      "primary_wards": [
+        {"name": "Minh Phụng", "is_bold": true},
+        {"name": "Bình Thới", "is_bold": true},
+        {"name": "Hòa Bình", "is_bold": true},
+        {"name": "Phú Thọ", "is_bold": true},
+        {"name": "Bàn Cờ", "is_bold": true},
+        {"name": "Chợ Lớn", "is_bold": false},
+        {"name": "Hòa Hưng", "is_bold": false}
+      ],
+      "backup_wards": [
+        {"name": "Diên Hồng", "is_bold": true},
+        {"name": "Vườn Lài", "is_bold": true},
+        {"name": "Bến Thành", "is_bold": true},
+        {"name": "Xuân Hòa", "is_bold": true}
+      ]
+    },
+    "8462": {
+      "code": "8462",
+      "name": "Nguyễn Hoàng Khang",
+      "full_name": "8462 - Nguyễn Hoàng Khang - Customer Success - SGN",
+      "city": "Hồ Chí Minh",
+      "area": "Quận 12",
+      "primary_wards": [
+        {"name": "Thới An", "is_bold": true},
+        {"name": "Tân Thới Hiệp", "is_bold": true},
+        {"name": "Gò Vấp", "is_bold": true},
+        {"name": "Đông Hưng Thuận", "is_bold": true},
+        {"name": "Trung Mỹ Tây", "is_bold": false},
+        {"name": "Đông Thạnh", "is_bold": false}
+      ],
+      "backup_wards": [
+        {"name": "Thông Tây Hội", "is_bold": true},
+        {"name": "An Hội Tây", "is_bold": true},
+        {"name": "Tân Sơn", "is_bold": true},
+        {"name": "Lái Thiêu", "is_bold": false},
+        {"name": "Bà Điểm", "is_bold": false},
+        {"name": "Cầu Kiệu", "is_bold": false}
+      ]
+    }
+  }
+}

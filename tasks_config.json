@@ -1,0 +1,26 @@
+[
+  {
+    "enabled": true,
+    "crm_url": "https://kvcrm.kiotviet.vn/index.php?module=CSKHSC&parent=&page=1&view=List&viewname=17629&orderby=&sortorder=&search_params=%5B%5B%5B%22thoi_gian_checkin%22%2C%22bw%22%2C%222026-09-01%2C2026-09-30%22%5D%5D%5D",
+    "gsheet_url": "https://docs.google.com/spreadsheets/d/1DLBiD2kPO6Piw0kapG5W3quIEdc0XdVhRON4F8sxsi0/edit?gid=0#gid=0",
+    "tab_name": ""
+  },
+  {
+    "enabled": false,
+    "crm_url": "https://kvcrm.kiotviet.vn/index.php?module=CSKHSC&parent=&page=1&view=List&viewname=17372&orderby=&sortorder=&search_params=&search_key=summary&search_value=",
+    "gsheet_url": "https://docs.google.com/spreadsheets/d/1DLBiD2kPO6Piw0kapG5W3quIEdc0XdVhRON4F8sxsi0/edit?gid=858576#gid=858576",
+    "tab_name": ""
+  },
+  {
+    "enabled": true,
+    "crm_url": "https://kvcrm.kiotviet.vn/index.php?module=CSKHSC&parent=&page=1&view=List&viewname=19211&orderby=&sortorder=&search_params=&search_key=summary&search_value=",
+    "gsheet_url": "https://docs.google.com/spreadsheets/d/1DLBiD2kPO6Piw0kapG5W3quIEdc0XdVhRON4F8sxsi0/edit?gid=1699113051#gid=1699113051",
+    "tab_name": ""
+  },
+  {
+    "enabled": true,
+    "crm_url": "https://kvcrm.kiotviet.vn/index.php?module=Potentials&parent=&page=1&view=List&viewname=19637&orderby=&sortorder=&search_params=&search_key=potentialname&search_value=",
+    "gsheet_url": "https://docs.google.com/spreadsheets/d/1DLBiD2kPO6Piw0kapG5W3quIEdc0XdVhRON4F8sxsi0/edit?gid=505156029#gid=505156029",
+    "tab_name": "OTP phần cứng"
+  }
+]

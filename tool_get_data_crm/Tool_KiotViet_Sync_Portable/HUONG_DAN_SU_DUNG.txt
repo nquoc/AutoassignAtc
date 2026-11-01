@@ -1,0 +1,63 @@
+================================================================================
+           HƯỚNG DẪN SỬ DỤNG TOOL KIOTVIET CRM SYNC (BẢN PORTABLE)
+================================================================================
+Thư mục này đã được đóng gói trọn gói để bạn có thể copy sang bất kỳ máy tính nào
+(cả Windows lẫn MacBook/macOS) và sử dụng ngay lập tức.
+
+--------------------------------------------------------------------------------
+1. CÁCH CHẠY TOOL TRÊN MÁY TÍNH WINDOWS
+--------------------------------------------------------------------------------
+Cách 1 (KHUYẾN DÙNG - KHÔNG CẦN CÀI PYTHON HOẶC BẤT KỲ THƯ VIỆN NÀO):
+  -> Nhấp đúp chuột vào file: KiotViet_CRM_Sync.exe (hoặc Chay_Tool.bat)
+  -> Giao diện Pro v3.0 sẽ hiện lên ngay lập tức!
+
+Cách 2 (Nếu muốn chạy bằng mã nguồn Python):
+  -> Yêu cầu máy đã cài Python 3.10 trở lên.
+  -> Nhấp đúp file: Cai_Dat_Moi_Truong_Python.bat (chỉ chạy 1 lần đầu).
+  -> Sau đó nhấp đúp file: Chay_Tool.bat.
+
+--------------------------------------------------------------------------------
+2. CÁCH CHẠY TOOL TRÊN MACBOOK / macOS
+--------------------------------------------------------------------------------
+  -> Xem chi tiết tại file: HUONG_DAN_CHO_MACBOOK.txt
+  -> Bước 1: Đảm bảo máy Mac có Python 3 (https://www.python.org/downloads/macos/)
+  -> Bước 2: Nhấp đúp file: Cai_Dat_Mac.command (chỉ chạy 1 lần đầu).
+  -> Bước 3: Nhấp đúp file: Chay_Tool_Mac.command để mở Tool.
+  *(Nếu Mac báo quyền thực thi, mở Terminal gõ: chmod +x *.command)*
+
+--------------------------------------------------------------------------------
+3. CÁCH LẤY VÀ DÁN COOKIE CRM (CHƯA ĐẦY 5 GIÂY)
+--------------------------------------------------------------------------------
+Trên máy tính nào đã đăng nhập KiotViet CRM:
+  Bước 1: Cài tiện ích Chrome 1-click:
+          - Mở Google Chrome -> Truy cập: chrome://extensions/
+          - Bật công tắc "Developer mode" (Chế độ cho nhà phát triển) ở góc trên bên phải.
+          - Bấm "Load unpacked" (Tải tiện ích đã giải nén) -> Chọn thư mục:
+            "chrome_extension_get_cookie" có sẵn trong thư mục này.
+  Bước 2: Vào trang https://kvcrm.kiotviet.vn/ -> Bấm vào biểu tượng Extension
+          -> Bấm "Copy Cookie CRM" (Hệ thống sẽ tự động copy chuỗi cookie vào Clipboard).
+  Bước 3: Mở Tool lên -> Dán Cookie vào ô "Cookie CRM" trên giao diện (hoặc dán đè
+          vào file cookie.txt).
+          -> Đèn báo sẽ chuyển sang màu XANH LÁ (🟢 ĐÃ KẾT NỐI).
+
+--------------------------------------------------------------------------------
+4. CHẠY ĐỒNG BỘ DỮ LIỆU
+--------------------------------------------------------------------------------
+  - Bấm nút "🚀 BẮT ĐẦU CHẠY ĐỒNG BỘ TẤT CẢ" trên giao diện.
+  - Hệ thống sẽ tự động trích xuất các bộ lọc CRM và ghi đầy đủ vào các tab
+    tương ứng trên Google Sheets, đồng thời tự động kéo công thức và sao lưu ra file Excel.
+  - Bạn có thể bấm "⛔ DỪNG LẠI" bất kỳ lúc nào nếu muốn dừng tiến trình.
+
+--------------------------------------------------------------------------------
+5. DANH SÁCH CÁC FILE QUAN TRỌNG TRONG THƯ MỤC
+--------------------------------------------------------------------------------
+- KiotViet_CRM_Sync.exe       : File chương trình chạy trực tiếp trên Windows (không cần Python).
+- Chay_Tool.bat               : File khởi chạy nhanh trên Windows.
+- Cai_Dat_Mac.command         : File cài đặt thư viện tự động cho MacBook.
+- Chay_Tool_Mac.command       : File khởi chạy Tool cho MacBook.
+- HUONG_DAN_CHO_MACBOOK.txt   : Hướng dẫn chi tiết riêng cho người dùng MacBook.
+- credentials.json            : File xác thực Service Account kết nối Google Sheets (GIỮ NGUYÊN).
+- tasks_config.json           : File lưu cấu hình các bộ lọc và link Sheet (GIỮ NGUYÊN).
+- cookie.txt                  : File tự động lưu cookie CRM mới nhất.
+- chrome_extension_get_cookie : Thư mục tiện ích Chrome hỗ trợ lấy cookie 1 chạm.
+================================================================================

@@ -1,0 +1,156 @@
+{
+  "quoc": [
+    {
+      "short_id": "8178",
+      "name": "8178 - Phan Ngọc Nguyên - Customer Success - BĐH",
+      "internal_id": "11212"
+    },
+    {
+      "short_id": "8231",
+      "name": "8231 - Thượng Thái Hiếu - Customer Success - SGN",
+      "internal_id": "7487"
+    },
+    {
+      "short_id": "8437",
+      "name": "8437 - Nguyễn Đoàn Hưng Phát - Customer Success - SGN",
+      "internal_id": "11161"
+    },
+    {
+      "short_id": "8440",
+      "name": "8440 - Doãn Việt Tùng - Customer Success - SGN",
+      "internal_id": "11197"
+    },
+    {
+      "short_id": "8447",
+      "name": "8447 - Võ Khánh Duy - Customer Success - SGN",
+      "internal_id": "11196"
+    },
+    {
+      "short_id": "8448",
+      "name": "8448 - Nguyễn Đỗ Nhật Minh - Customer Success",
+      "internal_id": "13457"
+    },
+    {
+      "short_id": "8458",
+      "name": "8458 - Đặng Duy Khương - Customer Success - CTO",
+      "internal_id": "12032"
+    },
+    {
+      "short_id": "8460",
+      "name": "8460 - Lê Minh Hiển - Customer Success - CTO",
+      "internal_id": "12080"
+    },
+    {
+      "short_id": "8461",
+      "name": "8461 - Trịnh Đức Phong - Customer Success - LĐG",
+      "internal_id": "12079"
+    },
+    {
+      "short_id": "8462",
+      "name": "8462 - Nguyễn Hoàng Khang - Customer Success",
+      "internal_id": "13488"
+    },
+    {
+      "short_id": "8466",
+      "name": "8466 - Lê Cao Minh Đức - Customer Success - CTO",
+      "internal_id": "12147"
+    },
+    {
+      "short_id": "8467",
+      "name": "8467 - Nguyễn Thành Đạt - Customer Success",
+      "internal_id": "13456"
+    },
+    {
+      "short_id": "8469",
+      "name": "8469 - Nguyễn Hưng Hải - Customer Success - GLI",
+      "internal_id": "11670"
+    },
+    {
+      "short_id": "8470",
+      "name": "8470 - Lương Trọng Đạo - Customer Success - CTO",
+      "internal_id": "12146"
+    },
+    {
+      "short_id": "8484",
+      "name": "8484 - Trần Thanh Nam - Customer Success - VTU",
+      "internal_id": "13759"
+    },
+    {
+      "short_id": "8489",
+      "name": "8489 - Nguyễn Hà Anh Vũ - Customer Success - LĐG",
+      "internal_id": "12464"
+    }
+  ],
+  "vietanh": [
+    {
+      "short_id": "8480",
+      "name": "8480 - Lê Ngọc Thắng - Customer Success - THA",
+      "internal_id": "12281"
+    },
+    {
+      "short_id": "8421",
+      "name": "8421 - Trần Minh Đồng - Customer Success - DNG",
+      "internal_id": "11587"
+    },
+    {
+      "short_id": "8463",
+      "name": "8463 - Cao Minh Ngọc - Customer Success - TNG",
+      "internal_id": "12077"
+    },
+    {
+      "short_id": "8422",
+      "name": "8422 - Phạm Hưng Lập - Customer Success - DNG",
+      "internal_id": "11588"
+    },
+    {
+      "short_id": "8486",
+      "name": "8486 - Mai Đức Minh - Customer Success - DNG",
+      "internal_id": "12432"
+    },
+    {
+      "short_id": "8457",
+      "name": "8457 - Đặng Lê Tiến Thành - Customer Success - HPG",
+      "internal_id": "12031"
+    },
+    {
+      "short_id": "8456",
+      "name": "8456 - Nguyễn Việt Anh - Customer Success - HNI",
+      "internal_id": "12030"
+    },
+    {
+      "short_id": "8280",
+      "name": "8280 - Vũ Minh Đức - Customer Success - HNI",
+      "internal_id": "10675"
+    },
+    {
+      "short_id": "8246",
+      "name": "8246 - Lê Văn Bách - Customer Success - HNI",
+      "internal_id": "6881"
+    },
+    {
+      "short_id": "8413",
+      "name": "8413 - Vũ Mạnh Tuấn - Customer Success - QNH",
+      "internal_id": "11076"
+    },
+    {
+      "short_id": "8415",
+      "name": "8415 - Vũ Tất Thắng - Customer Success - QNH",
+      "internal_id": "11162"
+    },
+    {
+      "short_id": "8492",
+      "name": "8492 - Nguyễn Thành Nam - Customer Success - HNI",
+      "internal_id": "13460"
+    },
+    {
+      "short_id": "8482",
+      "name": "8482 - Lê Đức Nhật - Customer Success - HUE",
+      "internal_id": "12982"
+    },
+    {
+      "short_id": "8483",
+      "name": "8483 - Ngô Trọng Nam Khánh - Customer Success",
+      "internal_id": "13740"
+    }
+  ]
+}

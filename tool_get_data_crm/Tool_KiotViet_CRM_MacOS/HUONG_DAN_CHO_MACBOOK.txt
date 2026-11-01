@@ -1,0 +1,104 @@
+================================================================================
+           HƯỚNG DẪN CÀI ĐẶT & SỬ DỤNG TOOL KIOTVIET CRM SYNC TRÊN MACBOOK
+================================================================================
+(Hỗ trợ 100% dòng MacBook M1, M2, M3, M4 Apple Silicon và MacBook Intel chạy macOS)
+
+🎯 TÍNH NĂNG CHÍNH:
+- Kéo dữ liệu mọi bộ lọc CRM KiotViet (CSKHSC, Potentials, HelpDesk...) về Excel (.xlsx).
+- Tự động định dạng bảng Excel chuẩn: tiêu đề nổi bật, viền bảng, co giãn cột.
+- Tùy chọn đồng bộ trực tiếp lên Google Sheets (bảo toàn công thức tính toán).
+- Lấy Cookie CRM 1-click qua tiện ích mở rộng Google Chrome cực nhanh.
+
+================================================================================
+BƯỚC 1: KIỂM TRA & CÀI ĐẶT PYTHON 3 TRÊN MAC
+================================================================================
+1. Kiểm tra máy đã có Python 3 chưa:
+   - Nhấn tổ hợp phím Cmd + Phím cách (Space) -> gõ "Terminal" -> nhấn Enter.
+   - Gõ lệnh sau rồi nhấn Enter:
+       python3 --version
+   - Nếu hiện "Python 3.x.x" (ví dụ: Python 3.10, 3.11, 3.12, 3.13) là máy ĐÃ CÓ.
+
+2. Nếu máy CHƯA CÓ Python hoặc muốn bản chạy ổn định nhất có sẵn Tkinter:
+   👉 Tải bộ cài chính thức từ: https://www.python.org/downloads/macos/
+   - Chọn bản "macOS 64-bit universal2 installer" (.pkg).
+   - Nhấp đúp mở file .pkg và bấm "Tiếp tục" (Next) để hoàn tất (mất ~1 phút).
+
+================================================================================
+BƯỚC 2: CẤP QUYỀN CHẠY CHO CÁC FILE SCRIPT (LÀM 1 LẦN DUY NHẤT)
+================================================================================
+Do cơ chế bảo mật Gatekeeper của macOS khi tải file từ Google Drive hoặc Internet:
+1. Mở Terminal trên Mac.
+2. Gõ chữ: cd (có dấu cách phía sau).
+3. Kéo và thả thư mục Tool này vào cửa sổ Terminal, rồi nhấn Enter.
+4. Gõ tiếp lệnh sau rồi nhấn Enter:
+       chmod +x *.command
+   (Lệnh này cấp quyền để bạn có thể nhấp đúp chạy trực tiếp các file .command).
+
+* Mẹo nhỏ: Nếu máy báo file bị chặn bảo mật (Quarantine), bạn chạy thêm lệnh:
+       xattr -d com.apple.quarantine *.command 2>/dev/null
+
+================================================================================
+BƯỚC 3: CÀI ĐẶT THƯ VIỆN TỰ ĐỘNG
+================================================================================
+1. Nhấp đúp (Double-click) vào file:
+       👉 Cai_Dat_Mac.command
+2. Script sẽ tự động tạo môi trường ảo (venv) và cài đặt các thư viện cần thiết:
+   - customtkinter (Giao diện trực quan hiện đại)
+   - openpyxl (Đọc, ghi và định dạng Excel)
+   - gspread & google-auth (Đồng bộ Google Sheets)
+3. Khi màn hình Terminal báo "✅ ĐÃ CÀI ĐẶT THÀNH CÔNG TẤT CẢ THƯ VIỆN!", 
+   bạn nhấn phím Enter để đóng cửa sổ.
+
+================================================================================
+BƯỚC 4: CÀI TIỆN ÍCH LẤY COOKIE CRM TRÊN GOOGLE CHROME
+================================================================================
+1. Mở trình duyệt Google Chrome trên Mac.
+2. Nhập vào thanh địa chỉ:
+       chrome://extensions/
+3. Bật công tắc "Developer mode" (Chế độ cho nhà phát triển) ở góc trên bên phải.
+4. Bấm nút "Load unpacked" (Tải tiện ích đã giải nén) ở góc trên bên trái.
+5. Chọn thư mục "chrome_extension_get_cookie" nằm ngay trong thư mục Tool này.
+6. Icon tiện ích KiotViet CRM sẽ xuất hiện trên thanh công cụ của Chrome.
+
+================================================================================
+BƯỚC 5: KHỞI ĐỘNG VÀ SỬ DỤNG TOOL
+================================================================================
+--- CÁCH 1: DÙNG GIAO DIỆN ĐỒ HỌA TRỰC QUAN (KHUYÊN DÙNG) ---
+1. Nhấp đúp vào file:
+       👉 Chay_Tool_Mac.command
+2. Lấy Cookie:
+   - Đăng nhập CRM KiotViet (https://kvcrm.kiotviet.vn/) trên Chrome.
+   - Bấm vào icon tiện ích Chrome -> bấm "Copy Cookie CRM".
+   - Quay lại Tool, bấm nút "📋 Dán từ Clipboard". Đèn tín hiệu sẽ báo:
+     🟢 ĐÃ KẾT NỐI (kèm mã phiên KVCRM_PHPSESSID).
+3. Chọn các tác vụ cần chạy (hoặc thêm URL bộ lọc mới).
+4. Tích chọn "Lưu Excel dự phòng" nếu muốn file .xlsx được xuất về thư mục này.
+5. Nhấn "🚀 BẮT ĐẦU CHẠY ĐỒNG BỘ TẤT CẢ" -> Tool sẽ tự động kéo data và lưu Excel!
+
+--- CÁCH 2: DÙNG DÒNG LỆNH TERMINAL (CLI) SIÊU NHANH ---
+Nếu bạn muốn xuất nhanh 1 bộ lọc CRM ra Excel mà không cần mở giao diện:
+1. Mở Terminal tại thư mục Tool.
+2. Gõ lệnh:
+       ./venv/bin/python3 crm_export_tool.py "URL_BO_LOC_CRM"
+   (Tool sẽ tự động nhận Cookie và xuất thẳng file Excel .xlsx chuẩn cho bạn).
+
+================================================================================
+XỬ LÝ CÁC VẤN ĐỀ THƯỜNG GẶP TRÊN MACOS:
+================================================================================
+1. Lỗi: "The file could not be executed because you do not have appropriate access privileges"
+   -> Hãy thực hiện Bước 2 (chạy lệnh: chmod +x *.command trong Terminal).
+
+2. Lỗi: "App can't be opened because it is from an unidentified developer"
+   -> Nhấp chuột phải (hoặc giữ Control + Click) vào file .command -> Chọn "Open" (Mở) -> Chọn "Open" lần nữa.
+
+3. Lỗi: "No module named '_tkinter'" (Thường gặp nếu cài Python qua Homebrew)
+   -> Mở Terminal và chạy lệnh:
+       brew install python-tk
+   -> Hoặc tải cài bản Python chính thức từ python.org để có sẵn Tkinter hoàn chỉnh.
+
+4. Cửa sổ Terminal mở lên rồi tắt ngay:
+   -> File script Chay_Tool_Mac.command đã được tích hợp cơ chế giữ cửa sổ lại để hiển thị mã lỗi. Hãy đọc thông báo lỗi hoặc chạy Cai_Dat_Mac.command để cài lại thư viện.
+
+5. Báo lỗi "Cookie hết hạn" hoặc "Invalid request":
+   -> Vào lại kvcrm.kiotviet.vn trên Chrome, bấm Copy Cookie CRM mới và dán lại vào Tool.
+================================================================================

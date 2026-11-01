@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Tài Liệu Kỹ Thuật Tích Hợp API KV CRM (VTiger Framework)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+  
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+
+  body {
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2c3e50;
+    line-height: 1.6;
+    font-size: 13px;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .header-cover {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 30px 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .header-cover h1 {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .header-cover p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .meta-box {
+    margin-top: 15px;
+    font-size: 12px;
+    background: rgba(255,255,255,0.15);
+    padding: 8px 12px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  h2 {
+    color: #1e3c72;
+    font-size: 17px;
+    border-bottom: 2px solid #2a5298;
+    padding-bottom: 6px;
+    margin-top: 25px;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  h3 {
+    color: #34495e;
+    font-size: 14px;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  p, li {
+    margin-bottom: 8px;
+    text-align: justify;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 12px;
+  }
+
+  th {
+    background-color: #f2f6fc;
+    color: #1e3c72;
+    font-weight: 700;
+    text-align: left;
+    padding: 8px 10px;
+    border: 1px solid #dcdfe6;
+  }
+
+  td {
+    padding: 8px 10px;
+    border: 1px solid #dcdfe6;
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #fafafa;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    font-size: 11px;
+  }
+
+  .badge-post { background-color: #409eff; color: white; }
+  .badge-get { background-color: #67c23a; color: white; }
+  .badge-req { background-color: #f56c6c; color: white; }
+  .badge-opt { background-color: #909399; color: white; }
+
+  pre {
+    background-color: #282c34;
+    color: #abb2bf;
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-family: 'Consolas', 'Courier New', Courier, monospace;
+    font-size: 11px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin: 10px 0;
+    line-height: 1.45;
+  }
+
+  code {
+    font-family: 'Consolas', 'Courier New', Courier, monospace;
+    background: #f0f2f5;
+    color: #c7254e;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+  }
+
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  .alert {
+    padding: 10px 14px;
+    border-radius: 5px;
+    margin: 12px 0;
+    font-size: 12px;
+  }
+
+  .alert-warning {
+    background-color: #fdf6ec;
+    border-left: 4px solid #e6a23c;
+    color: #e6a23c;
+  }
+
+  .alert-info {
+    background-color: #f4f4f5;
+    border-left: 4px solid #909399;
+    color: #606266;
+  }
+
+  .alert-success {
+    background-color: #f0f9eb;
+    border-left: 4px solid #67c23a;
+    color: #67c23a;
+  }
+
+  .page-break {
+    page-break-after: always;
+  }
+</style>
+</head>
+<body>
+
+<div class="header-cover">
+  <h1>📘 TÀI LIỆU KỸ THUẬT VÀ QUY TRÌNH TÍCH HỢP API KV CRM</h1>
+  <p>Tổng hợp chi tiết các API, Tham số Request, Phản hồi JSON, Mã lỗi &amp; Code mẫu Python Production Ready</p>
+  <div class="meta-box">
+    <strong>Hệ thống Target:</strong> KV CRM (kvcrm.kiotviet.vn) | <strong>Phiên bản:</strong> 2.0 | <strong>Cập nhật:</strong> 12/08/2026
+  </div>
+</div>
+
+<h2>1. TỔNG QUAN HỆ THỐNG &amp; KIẾN TRÚC XÁC THỰC (AUTHENTICATION &amp; SECURITY)</h2>
+
+<p>Hệ thống KiotViet CRM được xây dựng trên nền tảng <strong>VTiger CRM Framework</strong>. Mọi tác vụ trao đổi dữ liệu HTTP với máy chủ bắt buộc phải trải qua 2 lớp bảo mật song song:</p>
+
+<ol>
+  <li><strong>Session Cookie (PHPSESSID)</strong>: Lưu trữ phiên đăng nhập được cấp sau khi gửi form Auth tại <code>index.php?module=Users&amp;action=Login</code>.</li>
+  <li><strong>CSRF Magic Token (<code>__vtrftk</code>)</strong>: Mã Token ngẫu nhiên chống giả mạo request thay đổi liên tục theo từng giao dịch và phiên truy cập.</li>
+</ol>
+
+<div class="alert alert-warning">
+  <strong>⚠️ QUY TẮC AN TOÀN TUYỆT ĐỐI:</strong> Không bao giờ hardcode giá trị Token <code>__vtrftk</code> cố định. Trước khi gửi các lệnh POST làm thay đổi dữ liệu, hệ thống tự động phải thực hiện 1 request <code>GET</code> siêu nhẹ để trích xuất mã Token tươi mới nhất.
+</div>
+
+<h3>🔑 Thuật toán bóc tách CSRF Token bằng Python Regex:</h3>
+<pre><code>import re
+import urllib.request
+
+def fetch_csrf_token(cookie_str, module="HelpDesk", record_id=None):
+    if record_id:
+        url = f"https://kvcrm.kiotviet.vn/index.php?module={module}&amp;view=Detail&amp;record={record_id}"
+    else:
+        url = f"https://kvcrm.kiotviet.vn/index.php?module={module}&amp;view=List"
+    
+    headers = {"cookie": cookie_str, "user-agent": "Mozilla/5.0"}
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=8) as resp:
+        html = resp.read().decode('utf-8', errors='ignore')
+    
+    match = re.search(r'csrfMagicToken\s*=\s*["']([^"']+)["']', html)          or re.search(r'name=["']__vtrftk["']\s+value=["']([^"']+)["']', html)          or re.search(r'(sid:[a-zA-Z0-9,]+)', html)
+    
+    return match.group(1) if match else None</code></pre>
+
+<h2>2. API 1: CHUYỂN NGƯỜI XỬ LÝ (CHANGE OWNER ACTION)</h2>
+
+<p>Chức năng: Gán hoặc chuyển giao Ticket HelpDesk hoặc Đơn CSKHSC cho nhân viên / nhóm làm việc mới.</p>
+
+<ul>
+  <li><strong>HTTP Method</strong>: <span class="badge badge-post">POST</span></li>
+  <li><strong>Endpoint</strong>: <code>https://kvcrm.kiotviet.vn/index.php</code></li>
+  <li><strong>Content-Type</strong>: <code>application/x-www-form-urlencoded</code></li>
+  <li><strong>Header yêu cầu</strong>: <code>X-Requested-With: XMLHttpRequest</code></li>
+</ul>
+
+<h3>Danh sách Tham số Body (Form Data):</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Tham số</th>
+      <th>Kiểu dữ liệu</th>
+      <th>Trạng thái</th>
+      <th>Mô tả chi tiết</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>__vtrftk</code></td>
+      <td>String</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td>Mã CSRF token bóc tách từ HTML</td>
+    </tr>
+    <tr>
+      <td><code>module</code></td>
+      <td>String</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td><code>HelpDesk</code> (Ticket) hoặc <code>CSKHSC</code> (Đơn ATC)</td>
+    </tr>
+    <tr>
+      <td><code>action</code></td>
+      <td>String</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td>Cố định: <code>ChangeOwnerAction</code></td>
+    </tr>
+    <tr>
+      <td><code>viewname</code></td>
+      <td>String</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td><code>19320</code> (với HelpDesk) hoặc <code>16309</code> (với CSKHSC)</td>
+    </tr>
+    <tr>
+      <td><code>changeOwnerId</code></td>
+      <td>String</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td><strong>Mã ID Nội bộ CRM của nhân viên nhận</strong> (Ví dụ: <code>12147</code> cho NV 8466)</td>
+    </tr>
+    <tr>
+      <td><code>selected_ids[]</code></td>
+      <td>String / Array</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td>Record ID của bản ghi muốn chuyển (Ví dụ: <code>106725000</code>)</td>
+    </tr>
+    <tr>
+      <td><code>excluded_ids[]</code></td>
+      <td>String</td>
+      <td><span class="badge badge-opt">Tùy chọn</span></td>
+      <td>Mặc định truyền chuỗi rỗng <code>""</code></td>
+    </tr>
+    <tr>
+      <td><code>search_params</code></td>
+      <td>String</td>
+      <td><span class="badge badge-opt">Tùy chọn</span></td>
+      <td>Mặc định truyền <code>[[]]</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Phản hồi JSON Mẫu:</h3>
+<pre><code>{
+  "success": true,
+  "result": {
+    "flag": true,
+    "message": "Assigned Owner Changed Successfully"
+  }
+}</code></pre>
+
+<h2>3. API 2: CHUYỂN HỖ TRỢ ONLINE (SWITCH ONLINE SUPPORT)</h2>
+
+<p>Chức năng: Đổi loại công việc của đơn CSKHSC sang chế độ Hỗ trợ Online (tương ứng thao tác nút Chuyển Online trên giao diện).</p>
+
+<ul>
+  <li><strong>HTTP Method</strong>: <span class="badge badge-get">GET</span> / <span class="badge badge-post">POST</span></li>
+  <li><strong>Endpoint</strong>: <code>https://kvcrm.kiotviet.vn/index.php</code></li>
+</ul>
+
+<h3>Danh sách Query Parameters:</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Mẫu giá trị</th>
+      <th>Mô tả</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>module</code></td>
+      <td><code>CSKHSC</code></td>
+      <td>Module Đơn hỗ trợ gian hàng</td>
+    </tr>
+    <tr>
+      <td><code>action</code></td>
+      <td><code>SwitchOnlineSupport</code></td>
+      <td>Action chuyển Online</td>
+    </tr>
+    <tr>
+      <td><code>record</code></td>
+      <td><code>105251250</code></td>
+      <td>Record ID của đơn CSKHSC</td>
+    </tr>
+    <tr>
+      <td><code>cskhcs_type</code></td>
+      <td><code>CSKHOI_DVKH</code></td>
+      <td>Mã loại hỗ trợ Online (xem danh mục bên dưới)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Danh mục Mã <code>cskhcs_type</code> Hợp lệ:</h3>
+<ul>
+  <li><code>CSKHOI_DVKH</code>: CSKH Online chung (Khuyên dùng)</li>
+  <li><code>CSKHNA_DVKH</code>: CSKH Online chi nhánh Nghệ An</li>
+  <li><code>CSKHNI_DVKH</code>: CSKH Online chi nhánh Ninh Bình</li>
+  <li><code>CSKHOI_T15_DVKH</code>: CSKH Online T15</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>4. API 3: CẬP NHẬT TRƯỜNG THÔNG TIN AJAX (SAVEAJAX FIELD UPDATE)</h2>
+
+<p>Chức năng: Đổi trạng thái xử lý, cập nhật lý do từ chối hoặc chỉnh sửa mô tả nhanh mà không cần tải lại toàn bộ bản ghi.</p>
+
+<ul>
+  <li><strong>HTTP Method</strong>: <span class="badge badge-post">POST</span></li>
+  <li><strong>Endpoint</strong>: <code>https://kvcrm.kiotviet.vn/index.php</code></li>
+</ul>
+
+<h3>Request Parameters (Form Data):</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description / Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>__vtrftk</code></td>
+      <td>String</td>
+      <td>Mã CSRF token bảo mật</td>
+    </tr>
+    <tr>
+      <td><code>module</code></td>
+      <td>String</td>
+      <td><code>HelpDesk</code> hoặc <code>CSKHSC</code></td>
+    </tr>
+    <tr>
+      <td><code>action</code></td>
+      <td>String</td>
+      <td>Cố định: <code>SaveAjax</code></td>
+    </tr>
+    <tr>
+      <td><code>record</code></td>
+      <td>String</td>
+      <td>Record ID của Ticket hoặc Đơn CSKHSC</td>
+    </tr>
+    <tr>
+      <td><code>field</code></td>
+      <td>String</td>
+      <td>Tên trường cần thay đổi (<code>ticketstatus</code>, <code>ticketdenyreason</code>, <code>cskhcs_status</code>, <code>description</code>)</td>
+    </tr>
+    <tr>
+      <td><code>value</code></td>
+      <td>String</td>
+      <td>Giá trị mới cần ghi đè vào hệ thống</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Trường Hợp Đặc Biệt: Từ Chối Ticket HelpDesk</h3>
+<div class="alert alert-info">
+  📌 <strong>Quy trình bắt buộc khi Reject Ticket:</strong> Bắt buộc phải thực hiện 2 request SaveAjax liên tiếp:
+  <ol>
+    <li>Gửi <code>field="ticketdenyreason"</code>, <code>value="Không thuộc phạm vi dịch vụ"</code>.</li>
+    <li>Gửi <code>field="ticketstatus"</code>, <code>value="Rejected"</code>.</li>
+  </ol>
+</div>
+
+<h2>5. API 4: THÊM BÌNH LUẬN TICKET (MODCOMMENTS SAVEAJAX)</h2>
+
+<p>Chức năng: Đăng bình luận hoặc nội dung trao đổi vào phần Lịch sử của Ticket HelpDesk.</p>
+
+<ul>
+  <li><strong>HTTP Method</strong>: <span class="badge badge-post">POST</span></li>
+  <li><strong>Endpoint</strong>: <code>https://kvcrm.kiotviet.vn/index.php</code></li>
+</ul>
+
+<h3>Request Parameters (Form Data):</h3>
+<pre><code>__vtrftk       : sid:c8f123...,1723456789
+module         : ModComments
+action         : SaveAjax
+commentcontent : Khu vực không có SC hỗ trợ
+related_to     : 106709097  (Record ID của HelpDesk Ticket)</code></pre>
+
+<h2>6. API 5: XUẤT DỮ LIỆU ĐẦY ĐỦ (EXPORTDATA FULL TSV/EXCEL)</h2>
+
+<p>Chức năng: Xuất hàng loạt bản ghi theo bộ lọc Viewname. Đặc biệt, nội dung Mô tả trả về đạt <strong>100% độ dài nguyên bản</strong>, không bị cắt ngắn như trên giao diện web.</p>
+
+<ul>
+  <li><strong>HTTP Method</strong>: <span class="badge badge-post">POST</span></li>
+  <li><strong>Endpoint</strong>: <code>https://kvcrm.kiotviet.vn/index.php</code></li>
+  <li><strong>Response Content</strong>: Chuỗi ký tự Unicode TSV (Tab-Separated Values) định dạng UTF-16.</li>
+</ul>
+
+<h3>Request Parameters (Form Data):</h3>
+<pre><code>__vtrftk      : [CSRF_TOKEN]
+module        : HelpDesk (hoặc CSKHSC)
+source_module : HelpDesk (hoặc CSKHSC)
+action        : ExportData
+viewname      : 19320 (hoặc ID view bất kỳ)
+selected_ids  : []
+excluded_ids  : []
+mode          : ExportAllData
+page          : 1
+search_params : [[["cf_ticket_type","e","Hỗ trợ kỹ thuật,Hỗ trợ phần mềm..."]]]</code></pre>
+
+<h2>7. API 6: TÌM KIẾM TỔNG HỢP TOÀN HỆ THỐNG (GLOBAL SEARCH / BASIC AJAX SEARCH)</h2>
+
+<p>Chức năng: Tra cứu nhanh Ticket, Retailer ID, Lead, Hợp đồng hoặc Serial phần cứng theo mã gian hàng (Domain) hoặc từ khóa bất kỳ trên toàn bộ hệ thống CRM hoặc lọc riêng theo từng phân hệ.</p>
+
+<ul>
+  <li><strong>HTTP Method</strong>: <span class="badge badge-get">GET</span></li>
+  <li><strong>Endpoint</strong>: <code>https://kvcrm.kiotviet.vn/index.php?module=Vtiger&amp;view=BasicAjax&amp;mode=showSearchResults&amp;value={QUERY}</code></li>
+  <li><strong>Header yêu cầu</strong>: <code>X-Requested-With: XMLHttpRequest</code></li>
+</ul>
+
+<h3>Danh sách Tham số Query:</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Tham số</th>
+      <th>Kiểu dữ liệu</th>
+      <th>Trạng thái</th>
+      <th>Mô tả chi tiết &amp; Tùy chọn</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>module</code></td>
+      <td>String</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td>Cố định: <code>Vtiger</code></td>
+    </tr>
+    <tr>
+      <td><code>view</code></td>
+      <td>String</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td>Cố định: <code>BasicAjax</code></td>
+    </tr>
+    <tr>
+      <td><code>mode</code></td>
+      <td>String</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td>Cố định: <code>showSearchResults</code></td>
+    </tr>
+    <tr>
+      <td><code>value</code></td>
+      <td>String</td>
+      <td><span class="badge badge-req">Bắt buộc</span></td>
+      <td>Từ khóa tìm kiếm (Ví dụ: <code>nhanongcafe</code>, <code>TT8821066</code>, <code>501162149</code>)</td>
+    </tr>
+    <tr>
+      <td><code>searchModule</code></td>
+      <td>String</td>
+      <td><span class="badge badge-opt">Tùy chọn</span></td>
+      <td>
+        Phân hệ cần tìm kiếm riêng biệt:
+        <ul>
+          <li><code>HelpDesk</code>: Chỉ tìm riêng trong <strong>Tickets (Phiếu hỗ trợ)</strong></li>
+          <li><code>Serial_Product</code>: Chỉ tìm riêng trong <strong>Serial phần cứng</strong></li>
+          <li><code>CSKHSC</code>: Chỉ tìm riêng trong <strong>CSKH SC (Đơn hỗ trợ)</strong></li>
+          <li><em>(Bỏ trống hoặc không truyền)</em>: Tìm kiếm toàn bộ hệ thống (<strong>All Records</strong>)</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Cấu trúc HTML Kết quả Trả về:</h3>
+<p>Mỗi dòng kết quả trong HTML trả về có gắn sẵn thuộc tính <code>data-crmid</code> tương ứng với ID của bản ghi trên CRM:</p>
+<pre><code>&lt;!-- Mẫu dòng kết quả Ticket tìm thấy --&gt;
+&lt;tr data-crmid="107193877" id="HelpDesk_globalSearch_row_1" class="cursorPointer searchResultRow" onclick="window.location.href='index.php?module=HelpDesk&amp;view=Detail&amp;record=107193877'"&gt;
+  &lt;td&gt;[nhanongcafe] Cài đặt máy in | Hỗ trợ offline&lt;/td&gt;
+  &lt;td&gt;Mới tạo&lt;/td&gt;
+  &lt;td&gt;SC Group&lt;/td&gt;
+&lt;/tr&gt;</code></pre>
+
+<h3>Code Mẫu Python Tìm Kiếm Ticket Hoặc Toàn Hệ Thống:</h3>
+<pre><code>import urllib.parse, urllib.request, re, html
+
+def search_crm_records(query, module_filter="HelpDesk", cookie_str=""):
+    url = f"https://kvcrm.kiotviet.vn/index.php?module=Vtiger&amp;view=BasicAjax&amp;mode=showSearchResults&amp;value={urllib.parse.quote(query)}"
+    if module_filter:
+        url += f"&amp;searchModule={module_filter}"
+    
+    headers = {
+        "cookie": cookie_str,
+        "user-agent": "Mozilla/5.0",
+        "x-requested-with": "XMLHttpRequest"
+    }
+    
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        res_html = resp.read().decode('utf-8', errors='ignore')
+    
+    # Bóc tách danh sách record ID tìm thấy
+    results = []
+    rows = re.findall(r'&lt;tr[^&gt;]*data-crmid=["\'](\d+)["\'][^&gt;]*id=["\'](\w+)_globalSearch_row_\d+["\'][^&gt;]*&gt;(.*?)&lt;/tr&gt;', res_html, re.DOTALL)
+    for crm_id, mod_name, row_content in rows:
+        clean_text = html.unescape(re.sub(r'&lt;[^&gt;]+&gt;', ' ', row_content).strip())
+        results.append({
+            "record_id": crm_id,
+            "module": mod_name,
+            "summary": re.sub(r'\s+', ' ', clean_text)
+        })
+    return results</code></pre>
+
+<div class="page-break"></div>
+
+<h2>8. DANH MỤC ID NỘI BỘ NHÂN VIÊN &amp; NHÓM XỬ LÝ (CHANGEOWNERID MAPPING)</h2>
+
+<p>Bảng tra cứu nhanh ID Nội bộ dùng trong tham số <code>changeOwnerId</code> của API Chuyển người xử lý:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Mã Nhân viên</th>
+      <th>Họ và Tên Nhân viên / Tên Nhóm</th>
+      <th>Bộ phận / Phòng ban</th>
+      <th>CRM Internal ID (<code>changeOwnerId</code>)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>8201</strong></td>
+      <td>Nguyễn Ái Quốc</td>
+      <td>Customer Success Coacher</td>
+      <td><code>11216</code></td>
+    </tr>
+    <tr>
+      <td><strong>8466</strong></td>
+      <td>Lê Cao Minh Đức</td>
+      <td>Customer Success - CTO</td>
+      <td><code>12147</code></td>
+    </tr>
+    <tr>
+      <td><strong>8489</strong></td>
+      <td>Nguyễn Hà Anh Vũ</td>
+      <td>Customer Success - LĐG</td>
+      <td><code>12464</code></td>
+    </tr>
+    <tr>
+      <td><strong>8458</strong></td>
+      <td>Đặng Duy Khương</td>
+      <td>Customer Success - CTO</td>
+      <td><code>12032</code></td>
+    </tr>
+    <tr>
+      <td><strong>8464</strong></td>
+      <td>Lê Minh</td>
+      <td>Customer Success - VTU</td>
+      <td><code>12145</code></td>
+    </tr>
+    <tr>
+      <td><strong>8460</strong></td>
+      <td>Lê Minh Hiển</td>
+      <td>Customer Success - CTO</td>
+      <td><code>12080</code></td>
+    </tr>
+    <tr>
+      <td><strong>8178</strong></td>
+      <td>Phan Ngọc Nguyên</td>
+      <td>Customer Success - BĐH</td>
+      <td><code>11212</code></td>
+    </tr>
+    <tr>
+      <td><strong>8409</strong></td>
+      <td>Nguyễn Tiến Dũng</td>
+      <td>Customer Success - ĐLK</td>
+      <td><code>11585</code></td>
+    </tr>
+    <tr>
+      <td><strong>8469</strong></td>
+      <td>Nguyễn Hưng Hải</td>
+      <td>Customer Success - GLI</td>
+      <td><code>11670</code></td>
+    </tr>
+    <tr>
+      <td><strong>8461</strong></td>
+      <td>Trịnh Đức Phong</td>
+      <td>Customer Success - LĐG</td>
+      <td><code>12079</code></td>
+    </tr>
+    <tr>
+      <td><strong>8465</strong></td>
+      <td>Hồ Ngọc Thiên Hy</td>
+      <td>Customer Success - NTG</td>
+      <td><code>12146</code></td>
+    </tr>
+    <tr>
+      <td><strong>Nhóm</strong></td>
+      <td><strong>Chăm sóc khách hàng hỗ trợ trực tiếp</strong></td>
+      <td>Direct Support Group</td>
+      <td><code>10382</code></td>
+    </tr>
+    <tr>
+      <td><strong>Nhóm</strong></td>
+      <td><strong>SC Group</strong></td>
+      <td>Service Center Group</td>
+      <td><code>8845</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>9. BẢNG MÃ LỖI THƯỜNG GẶP (ERROR CODES &amp; TROUBLESHOOTING)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Mã Lỗi / Response</th>
+      <th>Nguyên nhân</th>
+      <th>Giải pháp khắc phục</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>{"success":false,"error":{"code":"Bạn không có quyền thực hiện thao tác này"}}</code></td>
+      <td>Bản ghi đã bị khóa, thuộc tài khoản khác hoặc tài khoản CRM hiện tại không có quyền sửa bản ghi này.</td>
+      <td>Chỉ thực hiện thêm bình luận (ModComments) hoặc liên hệ Admin phân lại quyền phân bổ bản ghi.</td>
+    </tr>
+    <tr>
+      <td><code>Invalid request</code></td>
+      <td>CSRF Magic Token (<code>__vtrftk</code>) bị sai hoặc Session Cookie hết hạn.</td>
+      <td>Gọi lại hàm <code>fetch_csrf_token()</code> để cập nhật token mới và đăng nhập lại nếu cookie hỏng.</td>
+    </tr>
+    <tr>
+      <td><code>Read operation timed out</code></td>
+      <td>Request xử lý quá nhiều bản ghi cùng lúc dẫn tới timeout mạng.</td>
+      <td>Chuyển từ Mass Action sang xử lý vòng lặp đơn từng bản ghi với timeout >= 10s.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>10. CODE MẪU PYTHON PRODUCTION READY (CLASS HOÀN CHỈNH)</h2>
+
+<pre><code>import urllib.request, urllib.parse, json, re
+
+class KVCrmClient:
+    def __init__(self, cookie_str):
+        self.cookie_str = cookie_str
+        self.base_url = "https://kvcrm.kiotviet.vn/index.php"
+        self.headers = {
+            "content-type": "application/x-www-form-urlencoded",
+            "cookie": self.cookie_str,
+            "user-agent": "Mozilla/5.0",
+            "x-requested-with": "XMLHttpRequest"
+        }
+
+    def get_csrf_token(self, module="HelpDesk", record_id=None):
+        url = f"{self.base_url}?module={module}&amp;view=Detail&amp;record={record_id}" if record_id else f"{self.base_url}?module={module}&amp;view=List"
+        req = urllib.request.Request(url, headers={"cookie": self.cookie_str})
+        with urllib.request.urlopen(req) as resp:
+            html = resp.read().decode('utf-8', errors='ignore')
+        match = re.search(r'csrfMagicToken\s*=\s*["']([^"']+)["']', html) or re.search(r'name=["']__vtrftk["']\s+value=["']([^"']+)["']', html)
+        return match.group(1) if match else None
+
+    def change_owner(self, module, record_id, target_staff_id, viewname="19320"):
+        token = self.get_csrf_token(module, record_id)
+        form = [
+            ("__vtrftk", token), ("module", module), ("action", "ChangeOwnerAction"),
+            ("viewname", viewname), ("excluded_ids[]", ""), ("changeOwnerId", str(target_staff_id)),
+            ("search_params", "[[]]"), ("selected_ids[]", str(record_id))
+        ]
+        data = urllib.parse.urlencode(form).encode('utf-8')
+        req = urllib.request.Request(self.base_url, data=data, headers=self.headers)
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+
+    def switch_online_support(self, record_id, support_type="CSKHOI_DVKH"):
+        url = f"{self.base_url}?module=CSKHSC&amp;action=SwitchOnlineSupport&amp;record={record_id}&amp;cskhcs_type={support_type}"
+        req = urllib.request.Request(url, headers=self.headers)
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+</code></pre>
+
+</body>
+</html>

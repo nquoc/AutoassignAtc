@@ -1,0 +1,7 @@
+pyTelegramBotAPI
+selenium
+beautifulsoup4
+requests
+lxml
+html5lib
+soupsieve

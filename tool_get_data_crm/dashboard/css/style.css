@@ -1,0 +1,109 @@
+/* ==========================================================================
+   KIOTVIET CRM ANALYTICS - MAIN STYLESHEET
+   Responsive Design & Modern Glassmorphism UI
+   ========================================================================== */
+
+/* Base font and background */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #0f172a;
+    color: #f8fafc;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+    background: rgba(30, 41, 59, 0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Custom Scrollbars */
+.custom-scroll {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, 0.5) rgba(15, 23, 42, 0.5);
+}
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 3px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.5);
+    border-radius: 3px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.8);
+}
+
+/* Responsive Breakpoints & Mobile Optimization */
+@media (max-width: 640px) {
+    body {
+        padding: 0.75rem !important;
+    }
+    .glass-card {
+        border-radius: 0.75rem;
+        padding: 1rem !important;
+    }
+    /* Thu nhỏ cỡ chữ tiêu đề trên mobile */
+    h1 {
+        font-size: 1.25rem !important;
+    }
+    h2 {
+        font-size: 1rem !important;
+    }
+    h3 {
+        font-size: 1.5rem !important;
+    }
+    /* Đảm bảo bảng không vỡ trên màn hình hẹp */
+    table {
+        font-size: 11px !important;
+    }
+    th, td {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    /* Tối ưu các nút chuyển tab trên mobile */
+    .module-nav-container {
+        width: 100% !important;
+        overflow-x: auto;
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.25rem;
+    }
+    .module-nav-btn {
+        white-space: nowrap;
+        flex: 0 0 auto;
+        padding: 0.5rem 0.75rem !important;
+        font-size: 11px !important;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    body {
+        padding: 1.25rem !important;
+    }
+    .glass-card {
+        padding: 1.25rem !important;
+    }
+}
+
+/* Cố định chiều cao canvas để Chart.js không bị giật khi render */
+.chart-container {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+}
+@media (max-width: 640px) {
+    .chart-container {
+        min-height: 260px;
+    }
+}

@@ -1,0 +1,5 @@
+{
+  "bot_token": "YOUR_TELEGRAM_BOT_TOKEN",
+  "chrome_profile_dir": "",
+  "gchat_webhook": "YOUR_GOOGLE_CHAT_WEBHOOK_URL"
+}

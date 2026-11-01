@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>KiotViet CRM - Dashboard Phân Tích Nhân Sự & Phần Cứng</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet (Responsive & Glassmorphism) -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col p-4 md:p-8 custom-scroll relative">
+
+
+
+    <!-- Top Loading Progress Bar (Glowing gradient progress bar at the very top) -->
+    <div id="topProgressBar" class="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 z-50 transition-all duration-150 shadow-md shadow-blue-500/40" style="width: 0%; opacity: 0;"></div>
+
+    <!-- Top Header -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-chart-column text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                        KiotViet CRM Analytics
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">
+                        Thống kê tỷ lệ Impact & Hiệu suất theo Nhân sự & Tỉnh thành (Google Sheet: <span class="text-blue-400 font-semibold">DATA</span> ➔ Tab: <span class="text-emerald-400 font-semibold" id="tabNameText">tudaunam</span>)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 w-full md:w-auto">
+            <!-- Sync Status Badge with Live Percentage & Mini Progress Bar -->
+            <div id="syncBadge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 transition-all duration-300 shadow-sm">
+                <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="syncBadgeText">Dữ liệu Google Sheets</span>
+                <div id="syncProgressTrack" class="w-16 sm:w-20 bg-slate-700/80 rounded-full h-1.5 overflow-hidden ml-1 hidden">
+                    <div id="syncProgressBar" class="h-full bg-gradient-to-r from-blue-400 to-emerald-400 transition-all duration-150" style="width: 0%"></div>
+                </div>
+            </div>
+            <button id="btnRefresh" onclick="fetchLiveOrReload()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition shadow-sm hover:border-slate-600 active:scale-95">
+                <i class="fa-solid fa-arrows-rotate text-blue-400" id="refreshIcon"></i>
+                Làm mới số liệu
+            </button>
+        </div>
+    </header>
+
+    <!-- Module Switcher (Báo Cáo CS Impact vs Doanh Thu Phần Cứng) -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <div class="inline-flex p-1 bg-slate-900/90 rounded-2xl border border-slate-700/80 shadow-xl backdrop-blur-md w-full sm:w-auto overflow-x-auto custom-scroll flex-nowrap sm:flex-wrap gap-1">
+            <button id="navImpactBtn" onclick="switchModule('impact')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition">
+                <i class="fa-solid fa-bullseye text-amber-300"></i>
+                <span>📊 CS Impact (tudaunam)</span>
+            </button>
+            <button id="navHardwareBtn" onclick="switchModule('hardware')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-microchip text-emerald-400"></i>
+                <span>🖥️ Doanh Thu Phần Cứng (phancung)</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">Mới</span>
+            </button>
+            <button id="navPCTQBtn" onclick="switchModule('pctq')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-table-cells text-violet-400"></i>
+                <span>📋 Phần Cứng Toàn Quốc</span>
+            </button>
+        </div>
+        <div id="moduleQuickStats" class="text-xs text-slate-400 hidden sm:flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="moduleQuickStatsText">Đang xem: Báo cáo tỷ lệ Impact (Sheet: DATA ➔ tudaunam)</span>
+        </div>
+    </div>
+
+
+    <div id="impactModuleSection">
+    <!-- Interactive Multi-Dimension Filter Bar -->
+    <div class="glass-card p-4 mb-8 border border-slate-700/80 bg-slate-900/80 shadow-xl backdrop-blur-md">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            
+            <!-- Left: Filter Dropdowns & Month Multi-Select Pills -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2 text-xs font-bold text-slate-300 mr-1">
+                    <i class="fa-solid fa-filter text-blue-400"></i>
+                    <span>Bộ lọc:</span>
+                </div>
+
+                <!-- Lọc Nhiều Tháng Cùng Lúc (Multi-Select Pills) -->
+                <div class="flex items-center gap-2 bg-slate-800/60 p-1.5 rounded-xl border border-slate-700/60">
+                    <span class="text-xs text-slate-400 font-semibold px-1 flex items-center gap-1">
+                        <i class="fa-regular fa-calendar-days text-indigo-400"></i> Tháng:
+                    </span>
+                    <div id="monthPillContainer" class="flex flex-wrap items-center gap-1">
+                        <!-- Rendered: [Tất cả] [T5] [T6] [T7] [T8] [T9] -->
+                    </div>
+                </div>
+
+                <!-- Lọc theo Ngày -->
+                <div class="flex items-center gap-1.5">
+                    <label class="text-xs text-slate-400 font-medium">Ngày:</label>
+                    <select id="filterDay" onchange="applyFilters()" class="bg-slate-800 border border-slate-700 focus:border-blue-500 rounded-lg px-2.5 py-1.5 text-xs text-white transition focus:outline-none cursor-pointer">
+                        <option value="">Tất cả ngày</option>
+                    </select>
+                </div>
+
+                <!-- Lọc theo Tỉnh/Thành phố -->
+                <div class="flex items-center gap-1.5">
+                    <label class="text-xs text-slate-400 font-medium">Tỉnh/TP:</label>
+                    <select id="filterCity" onchange="applyFilters()" class="bg-slate-800 border border-slate-700 focus:border-blue-500 rounded-lg px-2.5 py-1.5 text-xs text-white transition focus:outline-none cursor-pointer max-w-[170px] truncate">
+                        <option value="">Tất cả tỉnh thành</option>
+                    </select>
+                </div>
+
+                <!-- Reset Filters -->
+                <button onclick="resetFilters()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700 transition active:scale-95" title="Đặt lại tất cả bộ lọc">
+                    <i class="fa-solid fa-arrow-rotate-left text-[11px] text-slate-400"></i>
+                    <span>Đặt lại</span>
+                </button>
+            </div>
+
+            <!-- Right: View Mode Toggle (4 Chế Độ: Tỷ lệ Impact % | Khối Lượng | So Sánh Tháng | So Sánh Tỉnh/TP) -->
+            <div class="flex items-center gap-2 self-start lg:self-center">
+                <span class="text-xs text-slate-400 font-medium mr-1">Chế độ:</span>
+                <div class="inline-flex rounded-xl bg-slate-800/90 p-1 border border-slate-700 flex-wrap gap-1">
+                    <button id="modeImpactBtn" onclick="setViewMode('impact')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-bullseye text-amber-300"></i>
+                        <span>Tỷ Lệ Impact</span>
+                    </button>
+                    <button id="modeVolumeBtn" onclick="setViewMode('volume')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-column"></i>
+                        <span>Khối Lượng</span>
+                    </button>
+                    <button id="modeCompareBtn" onclick="setViewMode('compare')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-line text-emerald-400"></i>
+                        <span>So Sánh Tháng</span>
+                    </button>
+                    <button id="modeCityBtn" onclick="setViewMode('city')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-map-location-dot text-sky-400"></i>
+                        <span>So Sánh Tỉnh/TP</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Filter Active Summary & Impact Stats banner -->
+        <div id="filterSummaryBar" class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="filterSummaryText">Đang hiển thị toàn bộ 8.979 dòng dữ liệu hợp lệ</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-medium">
+                <span><i class="fa-solid fa-circle-check text-emerald-400"></i> Có Impact (1): <strong class="text-emerald-300 font-bold" id="bannerImpact1">5.907</strong></span>
+                <span><i class="fa-solid fa-circle-xmark text-rose-400"></i> Không Impact (0): <strong class="text-rose-300 font-bold" id="bannerImpact0">3.072</strong></span>
+                <span><i class="fa-solid fa-bolt text-amber-400"></i> Tỷ Lệ: <strong class="text-amber-300 font-bold" id="bannerImpactRate">65.8%</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Summary Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Card 1: Total Rows -->
+        <div class="glass-card p-5 relative overflow-hidden group hover:border-blue-500/40 transition duration-300">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400" id="kpiCard1Title">Tổng Số Dòng</p>
+                    <h3 class="text-3xl font-black mt-2 text-white" id="kpiTotalRows">...</h3>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg border border-blue-500/20">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400 mt-3 flex items-center gap-1" id="kpiTotalRowsSub">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i> Dòng hợp lệ sau lọc
+            </p>
+        </div>
+
+        <!-- Card 2: Impact 1 / Staff / Latest Month / City count -->
+        <div class="glass-card p-5 relative overflow-hidden group hover:border-emerald-500/40 transition duration-300">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400" id="kpiCard2Title">Có Impact (Số 1)</p>
+                    <h3 class="text-3xl font-black mt-2 text-emerald-400" id="kpiCard2Val">...</h3>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/20" id="kpiCard2IconBox">
+                    <i class="fa-solid fa-circle-check" id="kpiCard2Icon"></i>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400 mt-3 flex items-center gap-1" id="kpiCard2Sub">
+                <i class="fa-solid fa-check text-emerald-400"></i> Đạt hiệu quả tích cực
+            </p>
+        </div>
+
+        <!-- Card 3: Impact 0 / Top Performer / Baseline Month / Top City -->
+        <div class="glass-card p-5 relative overflow-hidden group hover:border-rose-500/40 transition duration-300">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400" id="kpiCard3Title">Không Impact (Số 0)</p>
+                    <h3 class="text-3xl font-black mt-2 text-rose-400" id="kpiCard3Val">...</h3>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-lg border border-rose-500/20" id="kpiCard3IconBox">
+                    <i class="fa-solid fa-circle-xmark text-rose-400" id="kpiCard3Icon"></i>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400 mt-3 flex items-center gap-1" id="kpiCard3Sub">
+                <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Chưa tạo impact
+            </p>
+        </div>
+
+        <!-- Card 4: Team Rate / Avg / MoM Trend / City Average -->
+        <div class="glass-card p-5 relative overflow-hidden group hover:border-amber-500/40 transition duration-300">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400" id="kpiCard4Title">Tỷ Lệ Impact Toàn Team</p>
+                    <h3 class="text-3xl font-black mt-2 text-amber-300" id="kpiCard4Val">...</h3>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg border border-amber-500/20" id="kpiCard4IconBox">
+                    <i class="fa-solid fa-bullseye text-amber-400" id="kpiCard4Icon"></i>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400 mt-3 flex items-center gap-1" id="kpiCard4Sub">
+                <i class="fa-solid fa-award text-amber-400"></i> Top 1: Nguyễn Tiến Dũng (77.6%)
+            </p>
+        </div>
+    </div>
+
+    <!-- Charts & Table Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+        
+        <!-- Left: Chart Card (7 cols) -->
+        <div class="lg:col-span-7 glass-card p-6 flex flex-col">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2" id="chartMainTitle">
+                        <i class="fa-solid fa-bullseye text-blue-400" id="chartTitleIcon"></i>
+                        <span id="chartTitleText">Tỷ Lệ Impact (%) Theo Nhân Sự</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5" id="chartSubTitle">So sánh % công việc thành công (impact = 1) giữa các nhân sự</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Sort Toggle -->
+                    <div class="flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/80 text-xs">
+                        <button id="btnSortRate" onclick="setSortMode('rate')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">% Impact</button>
+                        <button id="btnSortVolume" onclick="setSortMode('volume')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Số Dòng</button>
+                    </div>
+                    <!-- Type Toggle -->
+                    <div class="flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/80 text-xs">
+                        <button id="btnBarChart" onclick="setChartType('bar')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-blue-600 text-white transition">Cột</button>
+                        <button id="btnSecondaryChart" onclick="setChartType('secondary')" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Tròn</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="relative flex-1 min-h-[420px] w-full flex items-center justify-center">
+                <canvas id="staffChart"></canvas>
+            </div>
+            
+            <!-- Chart Legend Guide -->
+            <div id="chartLegendGuide" class="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-400">
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Xuất sắc (≥ 75%)</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> Tốt (60 - 74%)</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Đạt (40 - 59%)</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> Cần cải thiện (&lt; 40%)</span>
+            </div>
+        </div>
+
+        <!-- Right: Leaderboard Data Table (5 cols) -->
+        <div class="lg:col-span-5 glass-card p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-emerald-400" id="tableHeaderIcon"></i>
+                        <span id="tableMainTitle">Bảng Xếp Hạng Tỷ Lệ Impact</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Danh sách <span id="tableCountBadge" class="text-emerald-400 font-bold">16</span> mục theo bộ lọc</p>
+                </div>
+            </div>
+
+            <!-- Search Filter Input -->
+            <div class="relative mb-4">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Tìm nhanh theo tên..." 
+                       class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+            </div>
+
+            <!-- Scrollable Table -->
+            <div class="flex-1 overflow-x-auto overflow-y-auto max-h-[420px] custom-scroll pr-1">
+                <table class="w-full text-left text-xs whitespace-nowrap">
+                    <thead class="sticky top-0 bg-slate-900/95 text-slate-400 font-semibold border-b border-slate-800 z-10 backdrop-blur-md" id="tableHead">
+                        <!-- Dynamic Header (Được sinh tự động theo View Mode) -->
+                    </thead>
+                    <tbody id="staffTableBody" class="divide-y divide-slate-800/60 font-medium">
+                        <!-- Dynamic Rows Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    </div>
+
+
+    <!-- HARDWARE MODULE SECTION (Tab phancung) -->
+    <div id="hardwareModuleSection" class="hidden">
+        
+        <!-- Hardware Interactive Filter Bar -->
+        <div class="glass-card p-4 mb-8 border border-slate-700/80 bg-slate-900/80 shadow-xl backdrop-blur-md">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-2 text-xs font-bold text-slate-300 mr-1">
+                        <i class="fa-solid fa-filter text-emerald-400"></i>
+                        <span>Bộ lọc Phần Cứng:</span>
+                    </div>
+                    <!-- Nhân sự -->
+                    <div class="flex items-center gap-1.5">
+                        <label class="text-xs text-slate-400 font-medium">Nhân sự:</label>
+                        <select id="hwFilterStaff" onchange="applyHardwareFilters()" class="bg-slate-800 border border-slate-700 focus:border-emerald-500 rounded-lg px-2.5 py-1.5 text-xs text-white transition focus:outline-none cursor-pointer max-w-[220px] truncate">
+                            <option value="">Tất cả nhân sự</option>
+                        </select>
+                    </div>
+                    <!-- Trạng thái -->
+                    <div class="flex items-center gap-1.5">
+                        <label class="text-xs text-slate-400 font-medium">Trạng thái:</label>
+                        <select id="hwFilterStatus" onchange="applyHardwareFilters()" class="bg-slate-800 border border-slate-700 focus:border-emerald-500 rounded-lg px-2.5 py-1.5 text-xs text-white transition focus:outline-none cursor-pointer max-w-[180px] truncate">
+                            <option value="">Tất cả trạng thái</option>
+                        </select>
+                    </div>
+                    <!-- Tìm kiếm -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="hwSearchInput" oninput="applyHardwareFilters()" placeholder="Mã HĐ, Retailer ID, Gian hàng..." class="bg-slate-800 border border-slate-700 focus:border-emerald-500 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 transition focus:outline-none w-56">
+                    </div>
+                    <!-- Reset -->
+                    <button onclick="resetHardwareFilters()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700 transition active:scale-95" title="Đặt lại bộ lọc">
+                        <i class="fa-solid fa-arrow-rotate-left text-[11px] text-slate-400"></i>
+                        <span>Đặt lại</span>
+                    </button>
+                </div>
+                <!-- Right status pills -->
+                <div class="flex items-center gap-2 self-start lg:self-center text-xs">
+                    <span class="text-slate-400">Nguồn:</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-table"></i> Tab 'phancung' (Cột A:J)
+                    </span>
+                </div>
+            </div>
+            <!-- Summary bar -->
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="hwSummaryText">Đang hiển thị 187/187 đơn hàng</span>
+                </div>
+                <div class="flex items-center gap-4 text-xs font-medium">
+                    <span><i class="fa-solid fa-circle-check text-emerald-400"></i> Thành công: <strong class="text-emerald-300 font-bold" id="hwBannerSuccCount">145</strong></span>
+                    <span><i class="fa-solid fa-coins text-amber-400"></i> DT Thành công: <strong class="text-emerald-300 font-bold" id="hwBannerSuccAmount">186,380,000 ₫</strong></span>
+                    <span><i class="fa-solid fa-calculator text-blue-400"></i> Tổng giá trị: <strong class="text-blue-300 font-bold" id="hwBannerTotalAmount">251,235,000 ₫</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hardware KPI Summary Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- Card 1: Doanh Thu Thành Công -->
+            <div class="glass-card p-5 relative overflow-hidden group hover:border-emerald-500/40 transition duration-300">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Doanh Thu Thành Công</p>
+                        <h3 class="text-3xl font-black mt-2 text-emerald-400 tracking-tight" id="hwKpiSuccAmount">186,380,000 ₫</h3>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/20">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-3 flex items-center gap-1.5" id="hwKpiSuccAmountSub">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i> 145 đơn chốt thành công (77.5%)
+                </p>
+            </div>
+
+            <!-- Card 2: Tổng Toàn Bộ Giá Trị Đơn -->
+            <div class="glass-card p-5 relative overflow-hidden group hover:border-blue-500/40 transition duration-300">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Tổng Giá Trị Đơn Hàng</p>
+                        <h3 class="text-3xl font-black mt-2 text-white tracking-tight" id="hwKpiTotalAmount">251,235,000 ₫</h3>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg border border-blue-500/20">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-3 flex items-center gap-1.5" id="hwKpiTotalAmountSub">
+                    <i class="fa-solid fa-boxes-stacked text-blue-400"></i> Tổng 187 hợp đồng phần cứng
+                </p>
+            </div>
+
+            <!-- Card 3: Tỷ Lệ Đơn Thành Công -->
+            <div class="glass-card p-5 relative overflow-hidden group hover:border-amber-500/40 transition duration-300">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Tỷ Lệ Đơn Thành Công</p>
+                        <h3 class="text-3xl font-black mt-2 text-amber-300 tracking-tight" id="hwKpiSuccRate">77.5%</h3>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg border border-amber-500/20">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-3 flex items-center gap-1.5" id="hwKpiSuccRateSub">
+                    <i class="fa-solid fa-chart-pie text-amber-400"></i> 145 / 187 đơn hoàn tất
+                </p>
+            </div>
+
+            <!-- Card 4: Top 1 Nhân Sự Doanh Thu -->
+            <div class="glass-card p-5 relative overflow-hidden group hover:border-indigo-500/40 transition duration-300">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Top 1 Doanh Thu</p>
+                        <h3 class="text-xl font-black mt-2 text-indigo-300 tracking-tight truncate max-w-[200px]" id="hwKpiTopStaff">Nguyễn Ái Quốc</h3>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg border border-indigo-500/20">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-3 flex items-center gap-1.5" id="hwKpiTopStaffSub">
+                    <i class="fa-solid fa-coins text-emerald-400"></i> 34,815,000 ₫ (24 đơn TC)
+                </p>
+            </div>
+        </div>
+
+        <!-- Hardware Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+            <!-- Chart 1: Doanh Thu Thành Công Theo Nhân Sự (7 cols) -->
+            <div class="lg:col-span-7 glass-card p-6 flex flex-col">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-ranking-star text-emerald-400"></i>
+                            <span>Doanh Thu Thành Công Theo Nhân Sự (VNĐ)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Xếp hạng doanh số phần cứng của từng nhân sự (Đơn "Thành công" & "Đã chuyển nhượng")</p>
+                    </div>
+                    <div class="flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/80 text-xs">
+                        <button id="btnHwSortAmt" onclick="setHwStaffSort('revenue')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition">Doanh Thu</button>
+                        <button id="btnHwSortOrders" onclick="setHwStaffSort('orders')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Số Đơn</button>
+                    </div>
+                </div>
+                <div class="relative flex-1 min-h-[400px] w-full flex items-center justify-center">
+                    <canvas id="hwStaffChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Cơ Cấu Trạng Thái Đơn Hàng (5 cols) -->
+            <div class="lg:col-span-5 glass-card p-6 flex flex-col">
+                <div class="mb-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-sky-400"></i>
+                        <span>Cơ Cấu Trạng Thái Đơn Hàng</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Tỷ trọng các trạng thái (Thành công, Bán hàng, Chuyển nhượng...)</p>
+                </div>
+                <div class="relative flex-1 min-h-[300px] w-full flex items-center justify-center">
+                    <canvas id="hwStatusChart"></canvas>
+                </div>
+                <div id="hwStatusLegend" class="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs text-slate-300">
+                    <!-- Dynamic Status Badges -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bảng 1: Bảng Xếp Hạng & Hiệu Suất Theo Nhân Sự -->
+        <div class="glass-card p-6 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-table-list text-emerald-400"></i>
+                        <span>BẢNG 1: Báo Cáo Doanh Thu & Trạng Thái Đơn Hàng Theo Nhân Sự</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Chi tiết số lượng đơn theo từng tình trạng và tổng doanh thu thành công</p>
+                </div>
+                <span class="text-xs text-slate-400 font-medium"><span id="hwStaffCountBadge" class="text-emerald-400 font-bold">12</span> nhân sự</span>
+            </div>
+            <div class="overflow-x-auto custom-scroll">
+                <table class="w-full text-left text-xs whitespace-nowrap">
+                    <thead class="bg-slate-900/95 text-slate-300 font-semibold border-b border-slate-700">
+                        <tr>
+                            <th class="py-3 px-3 text-center">#</th>
+                            <th class="py-3 px-4">Nhân sự xử lý</th>
+                            <th class="py-3 px-3 text-center cursor-pointer hover:text-white" onclick="setHwStaffSort('total')">Tổng đơn <i class="fa-solid fa-sort text-[10px] text-slate-500"></i></th>
+                            <th class="py-3 px-3 text-center cursor-pointer hover:text-emerald-400" onclick="setHwStaffSort('orders')" title="Bao gồm đơn trạng thái Thành công và Đã chuyển nhượng">Thành công (gồm Đã CN) <i class="fa-solid fa-sort text-[10px] text-slate-500"></i></th>
+                            <th class="py-3 px-3 text-center">Bán hàng</th>
+                            <th class="py-3 px-3 text-center" title="Trạng thái KH chuyển nhượng">KH chuyển nhượng</th>
+                            <th class="py-3 px-3 text-center">Thất bại</th>
+                            <th class="py-3 px-3 text-center">Khác</th>
+                            <th class="py-3 px-3 text-center cursor-pointer hover:text-amber-400" onclick="setHwStaffSort('rate')">Tỷ lệ TC (%) <i class="fa-solid fa-sort text-[10px] text-slate-500"></i></th>
+                            <th class="py-3 px-4 text-right cursor-pointer hover:text-emerald-300" onclick="setHwStaffSort('revenue')">DOANH THU THÀNH CÔNG (VNĐ) <i class="fa-solid fa-sort text-[10px] text-slate-500"></i></th>
+                            <th class="py-3 px-4 text-right">Tổng giá trị đơn (VNĐ)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hwStaffTableBody" class="divide-y divide-slate-800/60 font-medium">
+                        <!-- Injected by JS -->
+                    </tbody>
+                    <tfoot id="hwStaffTableFoot" class="bg-slate-900/90 font-bold border-t-2 border-slate-700 text-slate-200">
+                        <!-- Injected by JS -->
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bảng 2: Danh Sách Chi Tiết Đơn Hàng -->
+        <div class="glass-card p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-blue-400"></i>
+                        <span>BẢNG 2: Danh Sách Chi Tiết Đơn Hàng Phần Cứng</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Dữ liệu thô từng phiếu xuất kho & hợp đồng phần cứng (Cột A:J)</p>
+                </div>
+                <!-- Pagination controls -->
+                <div class="flex items-center gap-3 text-xs">
+                    <span class="text-slate-400">Trang <span id="hwPageNum" class="text-white font-bold">1</span>/<span id="hwTotalPages" class="text-white font-bold">1</span> (<span id="hwFilteredOrdersCount" class="text-emerald-400 font-bold">187</span> đơn)</span>
+                    <div class="inline-flex rounded-lg border border-slate-700 bg-slate-800 p-0.5">
+                        <button onclick="changeHwPage(-1)" id="hwPrevPageBtn" class="px-2.5 py-1 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-chevron-left text-[11px]"></i>
+                        </button>
+                        <button onclick="changeHwPage(1)" id="hwNextPageBtn" class="px-2.5 py-1 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-chevron-right text-[11px]"></i>
+                        </button>
+                    </div>
+                    <select id="hwPageSizeSelect" onchange="setHwPageSize(this.value)" class="bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-slate-300">
+                        <option value="15">15 dòng/trang</option>
+                        <option value="30">30 dòng/trang</option>
+                        <option value="50">50 dòng/trang</option>
+                        <option value="100">100 dòng/trang</option>
+                    </select>
+                </div>
+            </div>
+            <div class="overflow-x-auto custom-scroll">
+                <table class="w-full text-left text-xs whitespace-nowrap">
+                    <thead class="bg-slate-900/95 text-slate-300 font-semibold border-b border-slate-700">
+                        <tr>
+                            <th class="py-2.5 px-3 text-center">STT</th>
+                            <th class="py-2.5 px-3">Mã hợp đồng / PXK</th>
+                            <th class="py-2.5 px-3">Retailer ID</th>
+                            <th class="py-2.5 px-4">Tên gian hàng</th>
+                            <th class="py-2.5 px-4 text-right">Thành tiền (VNĐ)</th>
+                            <th class="py-2.5 px-3 text-center">Tình trạng</th>
+                            <th class="py-2.5 px-4">Người xử lý</th>
+                            <th class="py-2.5 px-3">Thời gian tạo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hwOrdersTableBody" class="divide-y divide-slate-800/60 font-medium">
+                        <!-- Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- PCTQ MODULE SECTION (phancungtoanquoc A1:M40) -->
+    <div id="pctqModuleSection" class="hidden">
+
+        <!-- Filter Bar -->
+        <div class="glass-card p-4 mb-8 border border-slate-700/80 bg-slate-900/80 shadow-xl backdrop-blur-md">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-2 text-xs font-bold text-slate-300 mr-1">
+                        <i class="fa-solid fa-filter text-violet-400"></i>
+                        <span>Bộ lọc:</span>
+                    </div>
+                    <!-- Coacher -->
+                    <div class="flex items-center gap-1.5">
+                        <label class="text-xs text-slate-400 font-medium">Coacher:</label>
+                        <select id="pctqFilterCoacher" onchange="applyPCTQFilters()" class="bg-slate-800 border border-slate-700 focus:border-violet-500 rounded-lg px-2.5 py-1.5 text-xs text-white transition focus:outline-none cursor-pointer">
+                            <option value="">Tất cả Coacher</option>
+                        </select>
+                    </div>
+                    <!-- Month pills -->
+                    <div class="flex items-center gap-1.5 bg-slate-800/60 p-1.5 rounded-xl border border-slate-700/60">
+                        <span class="text-xs text-slate-400 font-semibold px-1 flex items-center gap-1">
+                            <i class="fa-regular fa-calendar-days text-violet-400"></i> Tháng:
+                        </span>
+                        <div class="flex gap-1">
+                            <button id="pctqPillAll" onclick="setPCTQMonth('all')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-violet-600 text-white transition">Tất cả</button>
+                            <button id="pctqPill7" onclick="setPCTQMonth('7')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">T7</button>
+                            <button id="pctqPill8" onclick="setPCTQMonth('8')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">T8</button>
+                            <button id="pctqPill9" onclick="setPCTQMonth('9')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">T9</button>
+                        </div>
+                    </div>
+                    <!-- Reset -->
+                    <button onclick="resetPCTQFilters()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700 transition active:scale-95">
+                        <i class="fa-solid fa-arrow-rotate-left text-[11px] text-slate-400"></i>
+                        <span>Đặt lại</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2 self-start lg:self-center text-xs">
+                    <span class="text-slate-400">Nguồn:</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-violet-500/10 text-violet-400 border border-violet-500/20 font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-table"></i> phancungtoanquoc (A1:M40)
+                    </span>
+                </div>
+            </div>
+            <!-- Summary bar -->
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
+                    <span id="pctqSummaryText">Đang tải dữ liệu...</span>
+                </div>
+                <div class="flex items-center gap-4 text-xs font-medium">
+                    <span><i class="fa-solid fa-calendar-days text-sky-400"></i> T7: <strong class="text-sky-300 font-bold" id="pctqBannerT7">0 ₫</strong></span>
+                    <span><i class="fa-solid fa-calendar-days text-emerald-400"></i> T8: <strong class="text-emerald-300 font-bold" id="pctqBannerT8">0 ₫</strong></span>
+                    <span><i class="fa-solid fa-calendar-days text-amber-400"></i> T9: <strong class="text-amber-300 font-bold" id="pctqBannerT9">0 ₫</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card p-5 hover:border-sky-500/40 transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Doanh Thu Tháng 7</p>
+                        <h3 class="text-2xl font-black mt-2 text-sky-400 tracking-tight" id="pctqKpiT7">0 ₫</h3>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-lg border border-sky-500/20">
+                        <i class="fa-solid fa-7"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-3" id="pctqKpiT7Sub">—</p>
+            </div>
+            <div class="glass-card p-5 hover:border-emerald-500/40 transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Doanh Thu Tháng 8</p>
+                        <h3 class="text-2xl font-black mt-2 text-emerald-400 tracking-tight" id="pctqKpiT8">0 ₫</h3>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/20">
+                        <i class="fa-solid fa-8"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-3" id="pctqKpiT8Sub">—</p>
+            </div>
+            <div class="glass-card p-5 hover:border-amber-500/40 transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Doanh Thu Tháng 9</p>
+                        <h3 class="text-2xl font-black mt-2 text-amber-400 tracking-tight" id="pctqKpiT9">0 ₫</h3>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg border border-amber-500/20">
+                        <i class="fa-solid fa-9"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-3" id="pctqKpiT9Sub">—</p>
+            </div>
+            <div class="glass-card p-5 hover:border-violet-500/40 transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Tổng 3 Tháng (SC)</p>
+                        <h3 class="text-2xl font-black mt-2 text-violet-400 tracking-tight" id="pctqKpiGrand">0 ₫</h3>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-violet-500/10 text-violet-400 flex items-center justify-center text-lg border border-violet-500/20">
+                        <i class="fa-solid fa-sigma"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-3" id="pctqKpiGrandSub">—</p>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+            <!-- Grouped bar chart SC vs months (8 cols) -->
+            <div class="lg:col-span-8 glass-card p-6 flex flex-col">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-bar text-violet-400"></i>
+                            <span id="pctqChartTitle">So Sánh Doanh Thu T7 / T8 / T9 Theo SC</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Cột nhóm 3 tháng cạnh nhau — dễ dàng nhận ra ai tăng / giảm</p>
+                    </div>
+                    <div class="flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/80 text-xs">
+                        <button id="pctqSortGrand" onclick="setPCTQSort('grand')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-violet-600 text-white transition">Tổng</button>
+                        <button id="pctqSortT7" onclick="setPCTQSort('t7')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">T7</button>
+                        <button id="pctqSortT8" onclick="setPCTQSort('t8')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">T8</button>
+                        <button id="pctqSortT9" onclick="setPCTQSort('t9')" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">T9</button>
+                    </div>
+                </div>
+                <div class="relative flex-1 min-h-[420px] w-full">
+                    <canvas id="pctqSCChart"></canvas>
+                </div>
+                <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-400">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-sky-500"></span> Tháng 7</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> Tháng 8</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500"></span> Tháng 9</span>
+                </div>
+            </div>
+            <!-- Coacher summary (4 cols) -->
+            <div class="lg:col-span-4 glass-card p-6 flex flex-col">
+                <div class="mb-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user-tie text-indigo-400"></i>
+                        <span>Doanh Thu Theo Coacher</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Tổng 3 tháng mỗi Coacher + team</p>
+                </div>
+                <div class="relative flex-1 min-h-[300px] w-full flex items-center justify-center">
+                    <canvas id="pctqCoachChart"></canvas>
+                </div>
+                <div id="pctqCoachLegend" class="mt-4 pt-3 border-t border-slate-800/80 space-y-2 text-xs text-slate-300"></div>
+            </div>
+        </div>
+
+        <!-- Detail Table -->
+        <div class="glass-card p-6 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-table-list text-violet-400"></i>
+                        <span>Bảng Chi Tiết Doanh Thu Phần Cứng Toàn Quốc</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Mỗi SC — doanh thu T7 / T8 / T9 — so sánh xu hướng tháng</p>
+                </div>
+                <span class="text-xs text-slate-400"><span id="pctqTableCount" class="text-violet-400 font-bold">0</span> SC</span>
+            </div>
+            <div class="overflow-x-auto custom-scroll">
+                <table class="w-full text-left text-xs whitespace-nowrap">
+                    <thead class="bg-slate-900/95 text-slate-300 font-semibold border-b border-slate-700">
+                        <tr>
+                            <th class="py-3 px-3 text-center">#</th>
+                            <th class="py-3 px-4">Tên SC</th>
+                            <th class="py-3 px-3 text-center">KV</th>
+                            <th class="py-3 px-3 text-center">Level</th>
+                            <th class="py-3 px-3 text-center">Coacher</th>
+                            <th class="py-3 px-4 text-right text-sky-300 cursor-pointer hover:text-sky-200" onclick="setPCTQSort('t7')">Tháng 7 ↕</th>
+                            <th class="py-3 px-4 text-right text-emerald-300 cursor-pointer hover:text-emerald-200" onclick="setPCTQSort('t8')">Tháng 8 ↕</th>
+                            <th class="py-3 px-4 text-right text-amber-300 cursor-pointer hover:text-amber-200" onclick="setPCTQSort('t9')">Tháng 9 ↕</th>
+                            <th class="py-3 px-4 text-right text-violet-300 cursor-pointer hover:text-violet-200" onclick="setPCTQSort('grand')">Tổng 3T ↕</th>
+                            <th class="py-3 px-3 text-center">Xu hướng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pctqTableBody" class="divide-y divide-slate-800/60 font-medium">
+                    </tbody>
+                    <tfoot id="pctqTableFoot" class="bg-slate-900/90 font-bold border-t-2 border-slate-700 text-slate-200">
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <!-- / PCTQ MODULE SECTION -->
+
+
+    <!-- Footer -->
+    <footer class="mt-auto text-center text-xs text-slate-400 py-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div>
+            KiotViet CRM Auto Data Hub © 2026 • Đồng bộ tự động Google Sheets
+        </div>
+        <div class="flex items-center gap-4 text-slate-400">
+            <span><i class="fa-solid fa-bolt text-amber-400"></i> Cập nhật theo thời gian thực</span>
+            <span><i class="fa-solid fa-shield-halved text-blue-400"></i> Google Service Account</span>
+        </div>
+    </footer>
+
+    <!-- INLINE PRE-LOADED DATA (Fall-back tức thì khi mở không cần server) -->
+
+    <!-- ========================================== -->
+    <!-- MODULAR JAVASCRIPT ARCHITECTURE -->
+    <!-- ========================================== -->
+    <!-- 1. Offline Cache Datasets -->
+    <script src="js/data.js"></script>
+    <!-- 2. Application Core (Routing, Progress & State) -->
+    <script src="js/app.js"></script>
+    <!-- 3. CS Impact Analytics Module -->
+    <script src="js/impact.js"></script>
+    <!-- 4. Hardware Opportunity Module -->
+    <script src="js/hardware.js"></script>
+    <!-- 5. National Hardware Module (phancungtoanquoc) -->
+    <script src="js/pctq.js"></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+{
+  "sheet_title": "DATA",
+  "tab_name": "tudaunam",
+  "gid": 1647379928,
+  "total_rows": 13711,
+  "total_staff": 19,
+  "staff_data": [
+    {
+      "rank": 1,
+      "name": "8469 - Nguyễn Hưng Hải - Customer Success - GLI",
+      "count": 1414,
+      "percentage": 10.31,
+      "done": 1413,
+      "impact": 752
+    },
+    {
+      "rank": 2,
+      "name": "8409 - Nguyễn Tiến Dũng - Customer Success - ĐLK - Đã nghỉ",
+      "count": 1313,
+      "percentage": 9.58,
+      "done": 1312,
+      "impact": 914
+    },
+    {
+      "rank": 3,
+      "name": "8458 - Đặng Duy Khương - Customer Success - CTO",
+      "count": 1253,
+      "percentage": 9.14,
+      "done": 1252,
+      "impact": 781
+    },
+    {
+      "rank": 4,
+      "name": "8460 - Lê Minh Hiển - Customer Success - CTO",
+      "count": 1215,
+      "percentage": 8.86,
+      "done": 1215,
+      "impact": 699
+    },
+    {
+      "rank": 5,
+      "name": "8178 - Phan Ngọc Nguyên - Customer Success - BĐH",
+      "count": 1203,
+      "percentage": 8.77,
+      "done": 1191,
+      "impact": 820
+    },
+    {
+      "rank": 6,
+      "name": "8461 - Trịnh Đức Phong - Customer Success - LĐG",
+      "count": 1188,
+      "percentage": 8.66,
+      "done": 1188,
+      "impact": 710
+    },
+    {
+      "rank": 7,
+      "name": "8489 - Nguyễn Hà Anh Vũ - Customer Success - LĐG",
+      "count": 1179,
+      "percentage": 8.6,
+      "done": 1178,
+      "impact": 694
+    },
+    {
+      "rank": 8,
+      "name": "8466 - Lê Cao Minh Đức - Customer Success - CTO",
+      "count": 1116,
+      "percentage": 8.14,
+      "done": 1103,
+      "impact": 674
+    },
+    {
+      "rank": 9,
+      "name": "8464 - Lê Minh - Customer Success - VTU - Đã nghỉ",
+      "count": 1104,
+      "percentage": 8.05,
+      "done": 1104,
+      "impact": 614
+    },
+    {
+      "rank": 10,
+      "name": "8470 - Lương Trọng Đạo - Customer Success - CTO",
+      "count": 1021,
+      "percentage": 7.45,
+      "done": 1021,
+      "impact": 665
+    },
+    {
+      "rank": 11,
+      "name": "8488 - Nguyễn Đăng Khôi - Customer Success - KHA - Đã nghỉ - Đã nghỉ",
+      "count": 446,
+      "percentage": 3.25,
+      "done": 446,
+      "impact": 149
+    },
+    {
+      "rank": 12,
+      "name": "8467 - Hà Phước Tài - Customer Success - CTO - Đã nghỉ - Đã nghỉ",
+      "count": 427,
+      "percentage": 3.11,
+      "done": 388,
+      "impact": 159
+    },
+    {
+      "rank": 13,
+      "name": "8214 - Đặng Minh Tiến - Customer Success - ĐLK - Đã nghỉ - Đã nghỉ",
+      "count": 350,
+      "percentage": 2.55,
+      "done": 348,
+      "impact": 123
+    },
+    {
+      "rank": 14,
+      "name": "8201 - Nguyễn Ái Quốc - Customer Success Coacher",
+      "count": 186,
+      "percentage": 1.36,
+      "done": 180,
+      "impact": 155
+    },
+    {
+      "rank": 15,
+      "name": "8465 - Hồ Ngọc Thiên Hy - Customer Success - NTG - Đã nghỉ - Đã nghỉ",
+      "count": 179,
+      "percentage": 1.31,
+      "done": 179,
+      "impact": 109
+    },
+    {
+      "rank": 16,
+      "name": "8459 - Võ Thành Khá Lên - Customer Success - CTO - Đã nghỉ - Đã nghỉ",
+      "count": 105,
+      "percentage": 0.77,
+      "done": 105,
+      "impact": 65
+    },
+    {
+      "rank": 17,
+      "name": "Chăm sóc khách hàng SC Miền Nam",
+      "count": 8,
+      "percentage": 0.06,
+      "done": 0,
+      "impact": 0
+    },
+    {
+      "rank": 18,
+      "name": "Chăm sóc khách hàng N-A",
+      "count": 3,
+      "percentage": 0.02,
+      "done": 2,
+      "impact": 0
+    },
+    {
+      "rank": 19,
+      "name": "8253 - Nguyễn Thanh Tú - Customer Success - Đã nghỉ - Đã nghỉ",
+      "count": 1,
+      "percentage": 0.01,
+      "done": 0,
+      "impact": 0
+    }
+  ]
+}

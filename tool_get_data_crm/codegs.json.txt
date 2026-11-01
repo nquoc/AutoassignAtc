@@ -1,0 +1,61 @@
+function doGet(e) {
+  try {
+    // 1. Đọc các tham số từ URL
+    var params = e ? e.parameter : {};
+    var sheetName = params.sheet || params.tab || ""; // Tên sheet (ví dụ: tudaunam)
+    var gid = params.gid || "";                       // Hoặc GID (ví dụ: 1647379928)
+    var rangeStr = params.range || "";                // Vùng dữ liệu (ví dụ: A1:X, A1:U1000)
+    var limit = params.limit ? parseInt(params.limit) : 0; // Giới hạn số dòng
+
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = null;
+
+    // 2. Tìm trang tính theo tên Sheet hoặc GID
+    if (sheetName) {
+      sheet = ss.getSheetByName(sheetName);
+    } else if (gid) {
+      sheet = ss.getSheets().find(function(s) { return s.getSheetId().toString() === gid.toString(); });
+    }
+    
+    // Nếu không truyền hoặc không tìm thấy, mặc định lấy sheet đang mở
+    if (!sheet) {
+      sheet = ss.getActiveSheet();
+    }
+
+    // 3. Lấy dữ liệu theo Range chỉ định hoặc toàn bộ Sheet
+    var data = [];
+    if (rangeStr) {
+      data = sheet.getRange(rangeStr).getValues();
+    } else {
+      data = sheet.getDataRange().getValues();
+    }
+
+    // 4. Cắt bớt nếu có tham số limit
+    if (limit > 0 && data.length > limit + 1) {
+      data = data.slice(0, limit + 1);
+    }
+
+    // 5. Đóng gói kết quả JSON
+    var result = {
+      status: "success",
+      sheet_name: sheet.getName(),
+      gid: sheet.getSheetId(),
+      range: rangeStr || ("A1:" + sheet.getLastColumn() + sheet.getLastRow()),
+      total_rows: data.length,
+      headers: data.length > 0 ? data[0] : [],
+      data: data
+    };
+
+    // 6. Trả về kết quả JSON chuẩn (CORS enabled)
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    var errorResult = {
+      status: "error",
+      message: error.toString()
+    };
+    return ContentService.createTextOutput(JSON.stringify(errorResult))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>KV CRM Cookie Grabber Pro</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      width: 400px;
+      padding: 16px;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+    .title-area h1 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .title-area p {
+      font-size: 11px;
+      color: #64748b;
+    }
+    .status-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+    .status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #94a3b8;
+    }
+    .dot.online {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+    .dot.warning {
+      background: #f59e0b;
+      box-shadow: 0 0 6px #f59e0b;
+    }
+    .dot.offline {
+      background: #ef4444;
+    }
+    .badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .badge {
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge.ok {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+    .badge.missing {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-copy {
+      width: 100%;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: white;
+      border: none;
+      padding: 11px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 3px 6px rgba(22, 163, 74, 0.25);
+      transition: all 0.2s ease;
+    }
+    .btn-copy:hover {
+      background: linear-gradient(135deg, #15803d, #166534);
+      transform: translateY(-1px);
+    }
+    .btn-copy:active {
+      transform: translateY(1px);
+    }
+    .btn-copy.disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .btn-secondary-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-sec {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-sec:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+    .cookie-preview-box {
+      margin-top: 10px;
+    }
+    .cookie-preview-box label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    textarea {
+      width: 100%;
+      height: 70px;
+      padding: 8px;
+      font-size: 10px;
+      font-family: monospace;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #334155;
+      resize: none;
+      word-break: break-all;
+    }
+    .toast {
+      display: none;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #ecfdf5;
+      border: 1px solid #6ee7b7;
+      color: #065f46;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      animation: fadeIn 0.25s;
+    }
+    .alert-box {
+      display: none;
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 6px;
+      color: #92400e;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .footer {
+      margin-top: 10px;
+      font-size: 10.5px;
+      color: #94a3b8;
+      text-align: center;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-badge">KV CRM</div>
+    <div class="title-area">
+      <h1>Cookie Grabber Pro v2.0</h1>
+      <p>Trích xuất Cookie KiotViet CRM chuẩn 100%</p>
+    </div>
+  </div>
+
+  <div class="status-card">
+    <div class="status-top">
+      <div class="status-indicator">
+        <div id="statusDot" class="dot"></div>
+        <span id="statusText">Đang kiểm tra kết nối CRM...</span>
+      </div>
+      <span id="cookieCount" style="color: #64748b; font-size: 11px; font-weight: 600;">0 cookies</span>
+    </div>
+    <div class="badges-row" id="badgesRow">
+      <span id="badgeSession" class="badge missing">PHPSESSID: ?</span>
+      <span id="badgeUser" class="badge missing">User: ?</span>
+      <span id="badgeKvSession" class="badge missing">SSO: ?</span>
+    </div>
+  </div>
+
+  <div id="alertBox" class="alert-box">
+    ⚠️ <strong>Chưa tìm thấy phiên CRM đầy đủ!</strong> Vui lòng bấm nút <em>"Mở Tab CRM"</em> bên dưới để đăng nhập vào trang <code>kvcrm.kiotviet.vn</code> trước.
+  </div>
+
+  <div class="btn-group">
+    <button id="btnCopy" class="btn-copy">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      <span>Sao Chép Cookie Chuẩn (1-Click)</span>
+    </button>
+
+    <div class="btn-secondary-row">
+      <button id="btnDownload" class="btn-sec" title="Tải file cookie.txt về máy để dùng mãi mãi">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>Lưu cookie.txt</span>
+      </button>
+
+      <button id="btnOpenCrm" class="btn-sec" title="Mở trang KiotViet CRM trên tab mới hoặc chuyển tab">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span>Mở Tab CRM</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">
+    🎉 Đã copy Cookie CRM chuẩn vào bộ nhớ tạm!
+  </div>
+
+  <div class="cookie-preview-box">
+    <label for="cookiePreview">
+      <span>Xem trước chuỗi Cookie:</span>
+      <span id="csrfInfo" style="color: #0284c7; font-weight: normal;"></span>
+    </label>
+    <textarea id="cookiePreview" readonly placeholder="Đang đọc cookie từ trình duyệt..."></textarea>
+  </div>
+
+  <div class="footer">
+    💡 Sao chép xong dán vào tool hoặc tải file <b>cookie.txt</b> để tự động chạy.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

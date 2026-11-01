@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.exe
+
+# Environment and sensitive credentials (NEVER commit secrets to public repository)
+config.json
+service_account.json
+credentials.json
+**/credentials.json
+session.json
+cookie.txt
+**/cookie.txt
+last_chat_id.txt
+.env
+
+# Logs and runtime crash dumps
+*.log
+crash.log
+
+# Exported Customer & Ticket Data files
+*.xlsx
+*.tsv
+*.csv
+*.pdf
+*.rar
+*.zip
+assignment_history.json
+staff_mapping_cache.json
+doi_thong_tin*
+dia_chi*
+CRM_Export*
+Danh_Sach*
+Bao_Cao*
+Tra_Cuu*
+potentials*
+scratch*
+scratch/
+
+# Operating System files
+desktop.ini
+Thumbs.db
+.DS_Store

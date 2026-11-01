@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "KV CRM Cookie Grabber Pro",
+  "version": "2.0",
+  "description": "Lấy chuẩn 100% Cookie phiên làm việc KiotViet CRM (KVCRM_PHPSESSID, current_user, CSRF) để tự động hóa xuất dữ liệu.",
+  "permissions": [
+    "cookies",
+    "clipboardWrite",
+    "tabs",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://*.kiotviet.vn/*",
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Lấy Cookie KiotViet CRM"
+  },
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
