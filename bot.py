@@ -3250,8 +3250,13 @@ def handle_updatesheet_command(message):
     def run_sheet():
         try:
             import auto_sheet_updater
+            import importlib
+            importlib.reload(auto_sheet_updater)
             success, r_msg = auto_sheet_updater.run_auto_update_hcm_sheet()
-            bot.edit_message_text(chat_id=message.chat.id, message_id=status_msg.message_id, text=r_msg, parse_mode="Markdown")
+            try:
+                bot.edit_message_text(chat_id=message.chat.id, message_id=status_msg.message_id, text=r_msg, parse_mode="Markdown", disable_web_page_preview=True)
+            except Exception:
+                bot.edit_message_text(chat_id=message.chat.id, message_id=status_msg.message_id, text=r_msg, disable_web_page_preview=True)
         except Exception as e:
             bot.edit_message_text(chat_id=message.chat.id, message_id=status_msg.message_id, text=f"❌ Lỗi cập nhật sheet: {e}")
     threading.Thread(target=run_sheet, daemon=True).start()
@@ -3508,7 +3513,11 @@ def handle_text(message):
         handle_checktk_command(message)
         return
 
-    if text.lower() in ["updatesheet", "/updatesheet", "sheet", "/sheet", "capnhatsheet", "/capnhatsheet"]:
+    if text.lower() in [
+        "updatesheet", "/updatesheet", "sheet", "/sheet", "capnhatsheet", "/capnhatsheet",
+        "update sheet", "/update sheet", "cập nhật sheet", "cap nhat sheet",
+        "điền phường xã", "dien phuong xa", "điền sheet", "dien sheet", "chạy sheet", "chay sheet"
+    ]:
         handle_updatesheet_command(message)
         return
 
