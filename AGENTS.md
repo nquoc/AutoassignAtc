@@ -11,7 +11,7 @@ File này cung cấp toàn bộ kiến thức, quy tắc nghiệp vụ, bảng m
 
 | Yêu cầu của User | Lệnh CLI thực thi ngay lập tức | Kết quả đạt được |
 | :--- | :--- | :--- |
-| **Bàn giao / Kéo Ticket/ATC về SC** *(Ví dụ: `TT8802410 chuyển 8460`, `TT8944429 kéo về sc`, `nhanongcafe chuyển 8460`)* | `python quick_action.py transfer <TICKET_ATC_HOẶC_TÊN_GH> <MÃ_NV_HOẶC_SC>` | Tự tìm Ticket & ATC của gian hàng, check pool SC group/CSKH/Marketing và chuyển Owner (hỗ trợ cả mã NV và `sc` / `8845`). |
+| **Bàn giao / Kéo Ticket/ATC về SC** *(Ví dụ: `TT8802410 chuyển 8460`, `TT8944429 kéo về sc`, `nhanongcafe chuyển 8460`)* | `python quick_action.py transfer <TICKET_ATC_HOẶC_TÊN_GH> <MÃ_NV_HOẶC_SC>` | Tự tìm Ticket & ATC của gian hàng, check pool SC group/CSKH/Marketing và chuyển Owner (hỗ trợ cả mã NV và `sc` / `8845`). Tự động bắn thông báo sang Google Chat và tag đích danh `<users/{gid}>` nhân sự nhận. |
 | **Hủy / Từ chối đơn** *(Ví dụ: `500897558 hủy`, `TT8887286 từ chối`)* | `python quick_action.py reject <TICKET_HOẶC_ATC> [NỘI_DUNG_LÝ_DO]` | Đổi `cskhcs_status="Huy"`, nối lý do vào `Mô tả`, thêm ModComment (Mặc định: `"khu vực không có SC"`). |
 | **Chuyển Hỗ Trợ Online** *(Ví dụ: `500668446 online`, `107672641 online NA`, `109451241 online T15`)* | `python quick_action.py online <TICKET_ATC_HOẶC_RET_ID> [OI/NA/T15/NI]` | Gọi `checkCanChangeForm` và `SwitchOnlineSupport` chuyển về nhóm CSKH OI (`CSKHOI_DVKH`), NA (`CSKHNA_DVKH`), T15 (`CSKHOI_T15_DVKH`) hoặc NI (`CSKHNI_DVKH`). |
 | **Chia data tỉnh / Phường Xã** *(Ví dụ: `chia 5 gialai cho 8469`, `cto 1,2 all 8460`)* | `python quick_action.py region <TỈNH> <SỐ_LƯỢNG/all> <MÃ_NV> [PHƯỜNG_1,PHƯỜNG_2]` | Phân công data tỉnh/phường hàng loạt (hỗ trợ chọn nhiều phường cùng lúc qua checkbox Telegram hoặc cú pháp tin nhắn/CLI) & ghi lịch sử log. |
@@ -79,6 +79,10 @@ File này cung cấp toàn bộ kiến thức, quy tắc nghiệp vụ, bảng m
    - Khi cập nhật bất kỳ trường nào trên CRM (ví dụ: `sales_stage`, `cf_pot_note`,...): **BẮT BUỘC DÙNG ENDPOINT `SaveAjax` ĐƠN TRƯỜNG** (`POST index.php?module={MODULE}&action=SaveAjax&record={ID}&field={FIELD}&value={VALUE}`).
    - Nếu cần cập nhật đồng thời nhiều trường (ví dụ vừa sửa Ghi chú sao kê vừa đổi Tình trạng sang Chờ Xét Duyệt): **BẮT BUỘC TÁCH THÀNH 2 (HOẶC NHIỀU) REQUEST `SaveAjax` RIÊNG BIỆT**.
    - ⛔ **TUYỆT ĐỐI KHÔNG SUBMIT FORM EDITVIEW TOÀN PHẦN (`action=Save`)**: vì trên giao diện form web CRM, các trường dropdown khác (như `Cơ hội` / `potentialname`, `Trạng thái bảo lưu`, `Đối thủ`,...) thường có giá trị mặc định (như auto-select *"Hợp đồng phần mềm"* thay vì *"Hợp đồng phần cứng"*), nếu submit toàn form sẽ làm ghi đè sai lệch dữ liệu!
+
+9. 📢 **QUY TẮC BẮN THÔNG BÁO BÀN GIAO GOOGLE CHAT (TRANSFER NOTIFICATION RULE - BẮT BUỘC)**:
+   - Khi bàn giao thành công Ticket & ATC (qua tin nhắn Bot Telegram hoặc lệnh CLI `transfer`): **TỰ ĐỘNG BẮN THÔNG BÁO LÊN GOOGLE CHAT VÀ TAG ĐÍCH DANH NHÂN SỰ NHẬN** (`<users/{gid}>`) qua hàm `send_transfer_gchat` dựa trên bảng ánh xạ `gchat_user_map.json`.
+   - Giúp nhân sự phụ trách nhận được thông báo push ngay tức thì trên điện thoại / máy tính để vào xử lý ticket kịp thời.
 
 ---
 

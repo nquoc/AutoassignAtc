@@ -401,6 +401,16 @@ def process_transfer_thread(chat_id, query_str, staff_code):
             text=success_text, 
             parse_mode="Markdown"
         )
+        # Bắn thông báo lên Google Chat & tag đích danh nhân sự nhận
+        try:
+            from quick_action import send_transfer_gchat
+            threading.Thread(
+                target=send_transfer_gchat,
+                args=(rec_id, ticket_no, store_name, retailer_id, staff_code, staff_info, atcs, latest_atc, description),
+                daemon=True
+            ).start()
+        except Exception as ge:
+            print(f"⚠️ [Transfer] Lỗi gọi send_transfer_gchat: {ge}", flush=True)
     except Exception as e:
         err_msg = str(e)
         bot.edit_message_text(

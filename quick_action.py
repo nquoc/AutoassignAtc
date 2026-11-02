@@ -1283,12 +1283,102 @@ def do_send_ticket_gchat():
             mid = text[:4000].rfind('\n\n')
             if mid == -1: mid = 3900
             send_chunk(text[:mid])
+            time.sleep(1)
             send_chunk(text[mid:])
         else:
             send_chunk(text)
         return True, text
     except Exception as e:
         return False, f"Lỗi gửi Google Chat: {e}"
+
+def send_transfer_gchat(rec_id, ticket_no, store_name, retailer_id, staff_code, staff_info, atcs, latest_atc=None, description="", dry_run=False):
+    """
+    Sends a real-time notification to Google Chat when a Ticket/ATC transfer succeeds,
+    tagging the assigned staff member via <users/{gid}> if mapped in gchat_user_map.json.
+    """
+    try:
+        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+        if not os.path.exists(config_file):
+            return False, "config.json không tồn tại"
+        with open(config_file, "r", encoding="utf-8") as f:
+            cfg = json.load(f)
+        webhook_url = cfg.get("gchat_webhook")
+        if not webhook_url:
+            return False, "Chưa cấu hình gchat_webhook trong config.json"
+
+        gchat_map_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "gchat_user_map.json")
+        gchat_map = {}
+        if os.path.exists(gchat_map_file):
+            try:
+                with open(gchat_map_file, "r", encoding="utf-8") as f:
+                    gchat_map = json.load(f)
+            except:
+                gchat_map = {}
+
+        staff_code_str = str(staff_code).strip()
+        user_mention = ""
+        user_display = f"*{staff_code_str} - {staff_info}*"
+        
+        # Check mapping for Google Chat ID
+        if staff_code_str in gchat_map and gchat_map[staff_code_str].get("gchat_id"):
+            gid = str(gchat_map[staff_code_str]["gchat_id"]).strip()
+            if gid:
+                user_mention = f"<users/{gid}>"
+                user_display = f"{user_mention} (*{staff_code_str} - {staff_info}*)"
+
+        # Format ATC section
+        if atcs:
+            atc_part = f"• *ATC liên quan*: `{', '.join(atcs)}` (Đã chuyển sang {staff_code_str})"
+        else:
+            atc_part = "• *ATC liên quan*: Không có ATC liên quan ở SC GROUP"
+            if latest_atc and isinstance(latest_atc, dict):
+                atc_part += f"\n• *ATC gần nhất*: `{latest_atc.get('no', '')}` (Trạng thái: `{latest_atc.get('status', '')}`, Người xử lý: `{latest_atc.get('assigned_user', '')}`)"
+            else:
+                atc_part += "\n• *ATC gần nhất*: _Không tìm thấy ATC nào trên hệ thống_"
+
+        # Format Description section
+        desc_part = ""
+        if description and str(description).strip():
+            d_clean = str(description).strip()
+            if len(d_clean) > 800:
+                d_clean = d_clean[:800] + "..."
+            desc_part = f"\n• *Mô tả (Description)*:\n```\n{d_clean}\n```"
+
+        store_str = f"`{store_name}`" if store_name else "_Chưa xác định_"
+        ret_str = f"`{retailer_id}`" if retailer_id else "_Chưa xác định_"
+        tag_header = f"🔔 {user_mention} *Bạn có Ticket / ATC mới được bàn giao!*\n\n" if user_mention else ""
+
+        gchat_text = (
+            f"✅ *BÀN GIAO THÀNH CÔNG* #Ticket\n\n"
+            f"{tag_header}"
+            f"• *Mã Ticket/Gốc*: `{ticket_no}` (ID: `{rec_id}`)\n"
+            f"• *Tên gian hàng (Tên GH)*: {store_str}\n"
+            f"• *Retailer ID*: {ret_str}\n"
+            f"• *Nhân sự nhận*: {user_display}\n"
+            f"{atc_part}"
+            f"{desc_part}\n\n"
+            f"⚡ *Thời gian hoàn thành*: {time.strftime('%H:%M:%S %d/%m/%Y')}\n"
+            f"#Ticket"
+        )
+
+        if dry_run:
+            return True, gchat_text
+
+        payload = {"text": gchat_text}
+        req = urllib.request.Request(
+            webhook_url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json; charset=UTF-8"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            success = (resp.status == 200)
+            if success:
+                print(f"🎉 [GChat Transfer] Đã bắn thông báo bàn giao {ticket_no} -> {staff_code_str} lên Google Chat thành công!", flush=True)
+            return success, gchat_text
+    except Exception as e:
+        err_msg = f"Lỗi gửi Google Chat: {e}"
+        print(f"⚠️ [GChat Transfer] {err_msg}", flush=True)
+        return False, err_msg
 
 def do_check_sc_group(full_desc=False):
     """
@@ -2567,9 +2657,13 @@ if __name__ == '__main__':
     if cmd == "transfer" and len(args) >= 3:
         res_t = do_transfer(args[1], args[2])
         rec_id, ticket_no, retailer_id, atcs = res_t[:4]
+        latest_atc = res_t[4] if len(res_t) > 4 else None
         desc = res_t[5] if len(res_t) > 5 else ""
         store_name = res_t[6] if len(res_t) > 6 else ""
+        staff_info = STAFF_MAP.get(str(args[2]), (args[2], args[2]))[1]
         print(f"TRANSFER_SUCCESS: rec_id={rec_id}, ticket={ticket_no}, store={store_name}, retailer={retailer_id}, atcs={atcs}, staff={args[2]}, desc={desc}")
+        if "--no-gchat" not in args:
+            send_transfer_gchat(rec_id, ticket_no, store_name, retailer_id, args[2], staff_info, atcs, latest_atc, desc)
     elif cmd == "reject" and len(args) >= 2:
         cmt = args[2] if len(args) > 2 else "khu vực không có SC"
         rec_id, ticket_no, retailer_id, atcs = do_reject(args[1], cmt)
