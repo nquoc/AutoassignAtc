@@ -2733,5 +2733,9 @@ if __name__ == '__main__':
         thresh = int(args[3]) if len(args) > 3 and args[3].isdigit() else 10
         s, report_str, recs = do_auto_assign_under_10(batch_size=b_size, threshold=thresh, dry_run=is_dry)
         # do_auto_assign_under_10 already prints report_str
+    elif cmd in ["sheet", "updatesheet", "update_sheet", "capnhatsheet", "dienphuongxa"]:
+        import auto_sheet_updater
+        s, msg = auto_sheet_updater.run_auto_update_hcm_sheet()
+        print(msg)
     else:
         print(f"Unknown command: {args}")
