@@ -2737,9 +2737,9 @@ if __name__ == '__main__':
         import auto_sheet_updater
         s, msg = auto_sheet_updater.run_auto_update_hcm_sheet()
         print(msg)
-    elif cmd in ["themtb", "addtb", "themtanbinh", "add_tb", "dien_tb"] and len(args) >= 2:
+    elif cmd in ["themtb", "addtb", "themtanbinh", "add_tb", "dien_tb"]:
         import auto_sheet_updater
-        s, msg = auto_sheet_updater.add_tan_binh_backup_sheet(args[1])
+        s, msg = auto_sheet_updater.add_tan_binh_backup_sheet()
         print(msg)
     elif cmd in ["xoatb", "deltb", "xoatanbinh", "del_tb", "xoa_tb", "xoa_tanbinh"]:
         import auto_sheet_updater

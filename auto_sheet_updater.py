@@ -190,14 +190,14 @@ def run_auto_update_hcm_sheet(bot=None, chat_id=None):
         
         # Check active Tan Binh assignment
         tb_state_file = os.path.join(BASE_DIR, "tb_sheet_assignment.json")
-        active_tb_staff = None
+        active_tb = False
         if os.path.exists(tb_state_file):
             try:
                 with open(tb_state_file, "r", encoding="utf-8") as f:
                     tb_data = json.load(f)
-                    active_tb_staff = tb_data.get("assignee")
+                    active_tb = tb_data.get("enabled", False) or bool(tb_data.get("assignee"))
             except:
-                pass
+                active_tb = False
         
         # 2. Evaluate HCM personnel (in standard order)
         personnel_order = ["8447", "8448", "8440", "8467", "8462", "8231"]
@@ -211,14 +211,7 @@ def run_auto_update_hcm_sheet(bot=None, chat_id=None):
             total_load = atc + pending
             tier, desc, wards = compute_staff_wards(code, total_load, master)
             
-            raw_w_list = list(wards)
-            # If this staff member was manually assigned Tan Binh backup wards, append them
-            if active_tb_staff == code:
-                for tb_w in TAN_BINH_BACKUP_WARDS:
-                    if tb_w not in raw_w_list:
-                        raw_w_list.append(tb_w)
-                        
-            raw_staff_wards[code] = raw_w_list
+            raw_staff_wards[code] = wards
             summary.append({
                 "code": code,
                 "name": info["name"],
@@ -227,7 +220,7 @@ def run_auto_update_hcm_sheet(bot=None, chat_id=None):
                 "total_load": total_load,
                 "tier": tier,
                 "desc": desc,
-                "wards": raw_w_list
+                "wards": wards
             })
             
         # 3. Deduplicate wards across staff (Primary has priority over Backup, earlier staff has priority)
@@ -287,6 +280,12 @@ def run_auto_update_hcm_sheet(bot=None, chat_id=None):
                 hcm_rows.append([str(stt), "Hồ Chí Minh", w, f"{code} - {info['name']}", "", "", w])
                 stt += 1
                 
+        # If Tan Binh backup is active, append 6 wards with Column D = "backup Tân Bình cũ"
+        if active_tb:
+            for tb_w in TAN_BINH_BACKUP_WARDS:
+                hcm_rows.append([str(stt), "Hồ Chí Minh", tb_w, "backup Tân Bình cũ", "", "", tb_w])
+                stt += 1
+                
         end_row = start_row + len(hcm_rows) - 1
         
         if len(hcm_rows) > 0:
@@ -318,11 +317,10 @@ def run_auto_update_hcm_sheet(bot=None, chat_id=None):
                 f"   👉 Điền: {wards_str}\n"
             )
             
-        if active_tb_staff:
-            tb_staff_name = master["personnel"].get(active_tb_staff, {}).get("name", active_tb_staff)
-            report_text += f"\n🏢 **Cụm Tân Bình cũ**: Đã điền thêm 6 phường backup cho `{active_tb_staff} - {tb_staff_name}`.\n"
+        if active_tb:
+            report_text += f"\n🏢 **Cụm Tân Bình cũ**: Đã điền thêm 6 phường backup (Cột D: `backup Tân Bình cũ`).\n"
         else:
-            report_text += f"\n🏢 **Cụm Tân Bình cũ**: Chưa điền (Dùng lệnh `/themtb` hoặc `themtb <MÃ_NV>` để thêm).\n"
+            report_text += f"\n🏢 **Cụm Tân Bình cũ**: Chưa điền (Dùng lệnh `/themtb` hoặc `themtb` để thêm vào Sheet).\n"
             
         if unmapped:
             unmapped_str = ", ".join(f"`{w}` ({c})" for w, c in unmapped)
@@ -352,29 +350,15 @@ def run_auto_update_hcm_sheet(bot=None, chat_id=None):
                 pass
         return False, err_msg
 
-def add_tan_binh_backup_sheet(staff_code, bot=None, chat_id=None):
+def add_tan_binh_backup_sheet(staff_code=None, bot=None, chat_id=None):
     """
-    Sets the active assignee for Tan Binh backup wards and immediately re-updates the Google Sheet.
+    Enables Tan Binh backup wards (Column D: "backup Tân Bình cũ") and immediately re-updates the Google Sheet.
     """
-    staff_code_str = str(staff_code).strip()
-    if staff_code_str in TAN_BINH_EXCLUDED_STAFF:
-        msg = f"❌ **Không được phép:** 3 bạn Thái Hiếu (8231), Hoàng Khang (8462), Hưng Phát (8437) KHÔNG ĐƯỢC PHÉP nhận cụm Tân Bình cũ theo quy định!"
-        if bot and chat_id:
-            try: bot.send_message(chat_id, msg, parse_mode="Markdown")
-            except: bot.send_message(chat_id, msg)
-        return False, msg
-
-    if staff_code_str not in TAN_BINH_ALLOWED_STAFF:
-        msg = f"❌ **Mã nhân viên không hợp lệ:** Chỉ 4 bạn quanh công ty gồm: `8447` (Khánh Duy), `8440` (Việt Tùng), `8448` (Nhật Minh), `8467` (Thành Đạt) mới được phép nhận cụm Tân Bình cũ!"
-        if bot and chat_id:
-            try: bot.send_message(chat_id, msg, parse_mode="Markdown")
-            except: bot.send_message(chat_id, msg)
-        return False, msg
-
     tb_state_file = os.path.join(BASE_DIR, "tb_sheet_assignment.json")
     with open(tb_state_file, "w", encoding="utf-8") as f:
         json.dump({
-            "assignee": staff_code_str,
+            "enabled": True,
+            "label": "backup Tân Bình cũ",
             "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")
         }, f, ensure_ascii=False, indent=2)
 
@@ -390,15 +374,15 @@ def remove_tan_binh_backup_sheet(bot=None, chat_id=None):
             os.remove(tb_state_file)
         except:
             with open(tb_state_file, "w", encoding="utf-8") as f:
-                json.dump({"assignee": None}, f)
+                json.dump({"enabled": False}, f)
 
     return run_auto_update_hcm_sheet(bot=bot, chat_id=chat_id)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         cmd = sys.argv[1].lower()
-        if cmd in ["add", "themtb", "themtanbinh"] and len(sys.argv) > 2:
-            s, m = add_tan_binh_backup_sheet(sys.argv[2])
+        if cmd in ["add", "themtb", "themtanbinh"]:
+            s, m = add_tan_binh_backup_sheet()
             print("Result success:", s)
             print(m)
             sys.exit(0)
