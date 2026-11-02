@@ -204,7 +204,6 @@
       "backup_wards": [
         {"name": "Thông Tây Hội", "is_bold": true},
         {"name": "An Hội Tây", "is_bold": true},
-        {"name": "Tân Sơn", "is_bold": true},
         {"name": "Lái Thiêu", "is_bold": false},
         {"name": "Bà Điểm", "is_bold": false},
         {"name": "Cầu Kiệu", "is_bold": false}

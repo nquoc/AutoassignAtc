@@ -2352,6 +2352,22 @@ def handle_callback(call):
             ).start()
 
         return
+    if data.startswith("add_tb_sheet:"):
+        s_code = data.split(":")[1]
+        try: bot.answer_callback_query(call.id, f"Đang thêm Tân Bình cho {s_code}...")
+        except: pass
+        _execute_add_tb_sheet(chat_id, s_code, message_id=message_id)
+        return
+    elif data.startswith("del_tb_sheet:"):
+        try: bot.answer_callback_query(call.id, "Đang xoá Tân Bình khỏi sheet...")
+        except: pass
+        _execute_del_tb_sheet(chat_id, message_id=message_id)
+        return
+    elif data == "close_tb_sheet":
+        try: bot.delete_message(chat_id, message_id)
+        except: pass
+        return
+
     if data == "tb_menu":
 
         try:
@@ -3271,6 +3287,113 @@ def handle_updatesheet_command(message):
             bot.edit_message_text(chat_id=message.chat.id, message_id=status_msg.message_id, text=f"❌ Lỗi cập nhật sheet: {e}")
     threading.Thread(target=run_sheet, daemon=True).start()
 
+def get_tanbinh_sheet_markup():
+    markup = InlineKeyboardMarkup(row_width=2)
+    markup.add(
+        InlineKeyboardButton("👤 8447 - Võ Khánh Duy", callback_data="add_tb_sheet:8447"),
+        InlineKeyboardButton("👤 8440 - Doãn Việt Tùng", callback_data="add_tb_sheet:8440")
+    )
+    markup.add(
+        InlineKeyboardButton("👤 8448 - Nguyễn Đỗ Nhật Minh", callback_data="add_tb_sheet:8448"),
+        InlineKeyboardButton("👤 8467 - Nguyễn Thành Đạt", callback_data="add_tb_sheet:8467")
+    )
+    markup.add(
+        InlineKeyboardButton("🗑️ Xoá cụm Tân Bình khỏi Sheet", callback_data="del_tb_sheet:all"),
+        InlineKeyboardButton("❌ Đóng", callback_data="close_tb_sheet")
+    )
+    return markup
+
+@bot.message_handler(commands=['themtb', 'addtb', 'themtanbinh', 'add_tb', 'dientb'])
+def handle_themtb_command(message):
+    text_parts = message.text.strip().split()
+    if len(text_parts) > 1 and text_parts[1].isdigit():
+        staff_code = text_parts[1].strip()
+        _execute_add_tb_sheet(message.chat.id, staff_code)
+    else:
+        text_menu = (
+            "🏢 **ĐIỀN THÊM BACKUP CỤM TÂN BÌNH CŨ VÀO GOOGLE SHEET**\n\n"
+            "📋 **6 Phường cụm Tân Bình cũ:**\n"
+            "• `Tân Sơn Hòa`  • `Tân Sơn Nhất`  • `Tân Hòa`\n"
+            "• `Bảy Hiền`     • `Tân Bình`      • `Tân Sơn`\n\n"
+            "⛔ **Tuyệt đối loại trừ:** Thái Hiếu (8231), Hoàng Khang (8462), Hưng Phát (8437)\n\n"
+            "👉 **Bấm chọn 1 nhân sự dưới đây để điền thêm vào Google Sheet Miền Nam:**"
+        )
+        bot.send_message(message.chat.id, text_menu, parse_mode="Markdown", reply_markup=get_tanbinh_sheet_markup())
+
+@bot.message_handler(commands=['xoatb', 'deltb', 'xoatanbinh', 'del_tb', 'xoatb_sheet'])
+def handle_xoatb_command(message):
+    _execute_del_tb_sheet(message.chat.id)
+
+def _execute_add_tb_sheet(chat_id, staff_code, message_id=None):
+    from auto_sheet_updater import TAN_BINH_ALLOWED_STAFF, TAN_BINH_EXCLUDED_STAFF
+    staff_code_str = str(staff_code).strip()
+    if staff_code_str in TAN_BINH_EXCLUDED_STAFF:
+        msg_err = "❌ **Không được phép:** 3 bạn Thái Hiếu (8231), Hoàng Khang (8462), Hưng Phát (8437) KHÔNG ĐƯỢC PHÉP nhận cụm Tân Bình cũ theo quy định!"
+        if message_id:
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=msg_err, parse_mode="Markdown")
+        else:
+            bot.send_message(chat_id, msg_err, parse_mode="Markdown")
+        return
+
+    if staff_code_str not in TAN_BINH_ALLOWED_STAFF:
+        msg_err = "❌ **Mã nhân viên không hợp lệ:** Chỉ 4 bạn quanh công ty gồm: `8447` (Khánh Duy), `8440` (Việt Tùng), `8448` (Nhật Minh), `8467` (Thành Đạt) mới được phép nhận cụm Tân Bình cũ!"
+        if message_id:
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=msg_err, parse_mode="Markdown")
+        else:
+            bot.send_message(chat_id, msg_err, parse_mode="Markdown")
+        return
+
+    wait_text = f"⏳ **Đang điền thêm 6 phường cụm Tân Bình cũ cho `{staff_code_str}` vào Google Sheet...**"
+    if message_id:
+        status_msg_id = message_id
+        try:
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=wait_text, parse_mode="Markdown")
+        except: pass
+    else:
+        st_msg = bot.send_message(chat_id, wait_text, parse_mode="Markdown")
+        status_msg_id = st_msg.message_id
+
+    def run_worker():
+        try:
+            import auto_sheet_updater
+            import importlib
+            importlib.reload(auto_sheet_updater)
+            success, r_msg = auto_sheet_updater.add_tan_binh_backup_sheet(staff_code_str)
+            try:
+                bot.edit_message_text(chat_id=chat_id, message_id=status_msg_id, text=r_msg, parse_mode="Markdown", disable_web_page_preview=True)
+            except Exception:
+                bot.edit_message_text(chat_id=chat_id, message_id=status_msg_id, text=r_msg, disable_web_page_preview=True)
+        except Exception as e:
+            bot.edit_message_text(chat_id=chat_id, message_id=status_msg_id, text=f"❌ Lỗi điền sheet: {e}")
+
+    threading.Thread(target=run_worker, daemon=True).start()
+
+def _execute_del_tb_sheet(chat_id, message_id=None):
+    wait_text = "⏳ **Đang xoá 6 phường cụm Tân Bình cũ khỏi Google Sheet...**"
+    if message_id:
+        status_msg_id = message_id
+        try:
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=wait_text, parse_mode="Markdown")
+        except: pass
+    else:
+        st_msg = bot.send_message(chat_id, wait_text, parse_mode="Markdown")
+        status_msg_id = st_msg.message_id
+
+    def run_worker():
+        try:
+            import auto_sheet_updater
+            import importlib
+            importlib.reload(auto_sheet_updater)
+            success, r_msg = auto_sheet_updater.remove_tan_binh_backup_sheet()
+            try:
+                bot.edit_message_text(chat_id=chat_id, message_id=status_msg_id, text=r_msg, parse_mode="Markdown", disable_web_page_preview=True)
+            except Exception:
+                bot.edit_message_text(chat_id=chat_id, message_id=status_msg_id, text=r_msg, disable_web_page_preview=True)
+        except Exception as e:
+            bot.edit_message_text(chat_id=chat_id, message_id=status_msg_id, text=f"❌ Lỗi xoá sheet: {e}")
+
+    threading.Thread(target=run_worker, daemon=True).start()
+
 REGION_ALIASES = {
     "cto": "cantho",
     "cantho": "cantho",
@@ -3529,6 +3652,22 @@ def handle_text(message):
         "điền phường xã", "dien phuong xa", "điền sheet", "dien sheet", "chạy sheet", "chay sheet"
     ]:
         handle_updatesheet_command(message)
+        return
+
+    # Lệnh thêm / điền cụm Tân Bình cũ vào Google Sheet
+    match_themtb = re.match(r"^(?:themtb|addtb|themtanbinh|dientb|dien_tb|them_tb|thêm\s*tb|them\s*tb|thêm\s*tân\s*bình|them\s*tan\s*binh|điền\s*tb|dien\s*tb|điền\s*tân\s*bình|dien\s*tan\s*binh|điền\s*backup\s*tân\s*bình|dien\s*backup\s*tan\s*binh|điền\s*backup\s*tb|dien\s*backup\s*tb)\s*(\d{4,5})?$", text, re.IGNORECASE)
+    if match_themtb:
+        s_code = match_themtb.group(1)
+        if s_code:
+            _execute_add_tb_sheet(message.chat.id, s_code)
+        else:
+            handle_themtb_command(message)
+        return
+
+    # Lệnh xoá / gỡ cụm Tân Bình cũ khỏi Google Sheet
+    match_xoatb = re.match(r"^(?:xoatb|deltb|xoatanbinh|del_tb|xoa_tb|xóa\s*tb|xoa\s*tb|xóa\s*tân\s*bình|xoa\s*tan\s*binh|xáo\s*tb|xao\s*tb|xáo\s*tân\s*bình|xao\s*tan\s*binh|xóa\s*backup\s*tân\s*bình|xoa\s*backup\s*tan\s*binh|xóa\s*backup\s*tb|xoa\s*backup\s*tb)$", text, re.IGNORECASE)
+    if match_xoatb:
+        _execute_del_tb_sheet(message.chat.id)
         return
 
     match_goiy = re.match(r"^(?:goiy|goi\s*y|gợi\s*ý|gơi\s*y|suggest)\s*([a-zA-Z0-9_-]+)?$", text, re.IGNORECASE)

@@ -29,6 +29,8 @@ File này cung cấp toàn bộ kiến thức, quy tắc nghiệp vụ, bảng m
 | **Tìm theo PXK & Đổi Chờ Xét Duyệt (Đơn lẻ hoặc Hàng loạt)** *(Ví dụ: `pxk PXK/SG/430/10/2026`, `pxk PXK/SG/111... PXK/SG/222...`)* | `python quick_action.py pxk <DANH_SÁCH_PXK>` | Tự động search tìm Record ID theo số PXK `cf_pot_contractid`, bóc tách Tên GH và dùng `SaveAjax` chuyển sang `"Chờ Xét Duyệt"` an toàn 100%. |
 | **Tự động chia data (< 10 ATC đẩy thêm 8 data)** *(Ví dụ: `chia tự động`, `autoassign`, `check chia`)* | `python quick_action.py auto_assign [dry/run]` | Quét View 20154, tự chia thêm 8 data cho NV giữ < 10 ATC (chạy cố định 06:30 & 20:30 hàng ngày, ưu tiên kho riêng Cà Mau/Sóc Trăng -> Cần Thơ; Cần Thơ/Lâm Đồng ưu tiên NV ít data nhất). |
 | **Quét data tồn HCM & Điền Google Sheet (Phân tầng Tier)** *(Ví dụ: `sheet`, `updatesheet`, `cập nhật sheet`, `điền phường xã`)* | `python quick_action.py sheet` *(hoặc nhắn Telegram: `sheet` / `cập nhật sheet`)* | Tự động quét CRM live (View 20154 + data treo HCM), tính tổng tải (ATC + tồn), phân tầng Tier 0-4 và điền danh sách phường chính/backup chuẩn xác vào Google Sheet Miền Nam (Tự chạy cố định 21:00 hàng ngày). |
+| **Điền thêm backup cụm Tân Bình cũ vào Google Sheet** *(Ví dụ: `themtb 8447`, `themtb`, `thêm tb`, `điền tb`)* | `python quick_action.py themtb <MÃ_NV>` *(hoặc Telegram: `/themtb [MÃ_NV]` hoặc bấm menu)* | Điền thêm 6 phường cụm Tân Bình cũ vào hàng của NV được chỉ định trên Google Sheet Miền Nam (Chỉ áp dụng cho 4 bạn quanh cty: Duy `8447`, Tùng `8440`, Minh `8448`, Đạt `8467`; tuyệt đối cấm Khang, Hiếu, Phát). Tự động lưu cấu hình duy trì qua các lần cập nhật. |
+| **Xoá backup cụm Tân Bình cũ khỏi Google Sheet** *(Ví dụ: `xoatb`, `xóa tb`, `xáo tb`, `xoatanbinh`)* | `python quick_action.py xoatb` *(hoặc Telegram: `/xoatb`)* | Gỡ bỏ 6 phường cụm Tân Bình cũ khỏi Google Sheet Miền Nam và xóa cấu hình lưu trữ. |
 | **Xuất dữ liệu bộ lọc bất kỳ ra Excel / Google Sheets (100% Read-Only)** *(Ví dụ: view 17559, 16309, HelpDesk...)* | `python crm_export_tool.py "<LINK_BỘ_LỌC>" [COOKIE] [FILE.xlsx]` | Gọi trực tiếp API `ExportData` ngầm, lấy toàn bộ hàng nghìn dòng trong 1-2s, xuất Excel đẹp hoặc đẩy Google Sheets (Xem thêm [`HUONG_DAN_GET_DATA_CRM.md`](file:///h:/My%20Drive/tools/AutoassignAtc/HUONG_DAN_GET_DATA_CRM.md) & Extension 1-click tại `chrome_extension_get_cookie/`). |
 
 ---
@@ -178,7 +180,7 @@ File này cung cấp toàn bộ kiến thức, quy tắc nghiệp vụ, bảng m
    - **Phường Backup (Quận 10, Quận 1)**: `Diên Hồng`, `Vườn Lài`, `Bến Thành`, `Xuân Hòa` [IN ĐẬM].
 7. **8462 - Nguyễn Hoàng Khang** (Quận 12):
    - **Phường chính**: `Thới An`, `Tân Thới Hiệp`, `Gò Vấp`, `Đông Hưng Thuận` [IN ĐẬM]; `Trung Mỹ Tây`, `Đông Thạnh` [BÌNH THƯỜNG].
-   - **Phường Backup (Gò Vấp, Hóc Môn, Bình Dương)**: `Thông Tây Hội`, `An Hội Tây`, `Tân Sơn` [IN ĐẬM]; `Lái Thiêu`, `Bà Điểm`, `Cầu Kiệu` [BÌNH THƯỜNG].
+   - **Phường Backup (Gò Vấp, Hóc Môn, Bình Dương)**: `Thông Tây Hội`, `An Hội Tây` [IN ĐẬM]; `Lái Thiêu`, `Bà Điểm`, `Cầu Kiệu` [BÌNH THƯỜNG].
 
 ### B. Cụm Tân Bình Cũ (Quanh Cty) - Tách Menu Riêng:
 - **6 Phường cụm Tân Bình cũ**: `Tân Sơn Hòa`, `Tân Sơn Nhất`, `Tân Hòa`, `Bảy Hiền`, `Tân Bình`, `Tân Sơn`.
@@ -187,4 +189,7 @@ File này cung cấp toàn bộ kiến thức, quy tắc nghiệp vụ, bảng m
   2. Có **Menu riêng** (`tb_menu` hoặc lệnh `tanbinh`, `tb`) để quét và chia riêng cho các bạn quanh cty.
   3. **Nhân sự được phép nhận**: `8447` (Khánh Duy), `8440` (Việt Tùng), `8448` (Nhật Minh), `8467` (Thành Đạt).
   4. ⛔ **Tuyệt đối loại trừ**: `8231` (Thái Hiếu), `8462` (Hoàng Khang), `8437` (Hưng Phát).
+  5. **Quản lý trên Google Sheet Miền Nam**:
+     - Lệnh điền thêm: `themtb <MÃ_NV>` hoặc `/themtb` (bấm chọn menu 4 bạn quanh cty). Lưu trạng thái vào `tb_sheet_assignment.json` và duy trì qua các lần quét 21h tự động.
+     - Lệnh xoá: `xoatb` hoặc `/xoatb` (gỡ bỏ khỏi sheet ngay lập tức).
 
