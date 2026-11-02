@@ -1,4 +1,4 @@
-$procs = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*bot.py*" }
+$procs = Get-CimInstance Win32_Process | Where-Object { ($_.CommandLine -like "*\bot.py*" -or $_.CommandLine -like "* bot.py*") -and $_.CommandLine -notlike "*zalo*" }
 if ($procs) {
     foreach ($p in $procs) {
         Write-Host "Dang dung tien trinh PID: $($p.ProcessId)" -ForegroundColor Yellow
