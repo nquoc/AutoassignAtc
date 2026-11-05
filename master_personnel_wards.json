@@ -2,7 +2,7 @@
   "system_info": {
     "name": "Hệ thống điều phối data ATC - CS Hồ Chí Minh & Đồng Nai",
     "version": "2.1",
-    "updated_at": "2026-11-01T17:28:00+07:00",
+    "updated_at": "2026-11-05T16:05:00+07:00",
     "layout_architecture": {
       "block_1_provinces": "Dòng 2 đến trước Vũng Tàu (Cần Thơ, Cà Mau, Gia Lai, Lâm Đồng...)",
       "block_2_vung_tau_fixed": "Cố định ở trên: 4 phường Vũng Tàu (Tam Thắng, Vũng Tàu, Rạch Dừa, Phước Thắng - 8484 ANH Nam)",
@@ -42,14 +42,26 @@
     "vung_tau": {
       "city": "Hồ Chí Minh",
       "assignee": "Vũng Tàu - 8484 ANH Nam",
-      "wards": ["Tam Thắng", "Vũng Tàu", "Rạch Dừa", "Phước Thắng"]
+      "wards": [
+        "Tam Thắng",
+        "Vũng Tàu",
+        "Rạch Dừa",
+        "Phước Thắng"
+      ]
     },
     "dong_nai": {
       "city": "Đồng Nai",
       "assignee": "8437 - Nguyễn Đoàn Hưng Phát",
       "wards": [
-        "Biên Hòa", "Hố Nai", "Trấn Biên", "Tam Hiệp", "Trảng Bom",
-        "Trảng Dài", "Long Bình", "Tân Triều", "Bình Minh"
+        "Biên Hòa",
+        "Hố Nai",
+        "Trấn Biên",
+        "Tam Hiệp",
+        "Trảng Bom",
+        "Trảng Dài",
+        "Long Bình",
+        "Tân Triều",
+        "Bình Minh"
       ]
     }
   },
@@ -61,21 +73,60 @@
       "city": "Đồng Nai",
       "area": "TP.Biên Hoà, Trảng Bom",
       "primary_wards": [
-        {"name": "Hố Nai", "is_bold": true},
-        {"name": "Trấn Biên", "is_bold": true},
-        {"name": "Tam Hiệp", "is_bold": true},
-        {"name": "Trảng Bom", "is_bold": true},
-        {"name": "Bình Minh", "is_bold": true},
-        {"name": "Biên Hòa", "is_bold": true},
-        {"name": "Trảng Dài", "is_bold": false},
-        {"name": "Long Bình", "is_bold": false},
-        {"name": "Tân Triều", "is_bold": false}
+        {
+          "name": "Hố Nai",
+          "is_bold": true
+        },
+        {
+          "name": "Trấn Biên",
+          "is_bold": true
+        },
+        {
+          "name": "Tam Hiệp",
+          "is_bold": true
+        },
+        {
+          "name": "Trảng Bom",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Minh",
+          "is_bold": true
+        },
+        {
+          "name": "Biên Hòa",
+          "is_bold": true
+        },
+        {
+          "name": "Trảng Dài",
+          "is_bold": false
+        },
+        {
+          "name": "Long Bình",
+          "is_bold": false
+        },
+        {
+          "name": "Tân Triều",
+          "is_bold": false
+        }
       ],
       "backup_wards": [
-        {"name": "Thủ Đức", "is_bold": true},
-        {"name": "Linh Xuân", "is_bold": true},
-        {"name": "Tăng Nhơn Phú", "is_bold": true},
-        {"name": "Long Bình", "is_bold": true}
+        {
+          "name": "Thủ Đức",
+          "is_bold": true
+        },
+        {
+          "name": "Linh Xuân",
+          "is_bold": true
+        },
+        {
+          "name": "Tăng Nhơn Phú",
+          "is_bold": true
+        },
+        {
+          "name": "Long Bình",
+          "is_bold": true
+        }
       ]
     },
     "8231": {
@@ -85,19 +136,52 @@
       "city": "Hồ Chí Minh",
       "area": "Thủ Đức, Q9",
       "primary_wards": [
-        {"name": "Hiệp Bình", "is_bold": true},
-        {"name": "Thủ Đức", "is_bold": true},
-        {"name": "Tam Bình", "is_bold": true},
-        {"name": "Linh Xuân", "is_bold": true},
-        {"name": "Tăng Nhơn Phú", "is_bold": true},
-        {"name": "Long Bình", "is_bold": true}
+        {
+          "name": "Hiệp Bình",
+          "is_bold": true
+        },
+        {
+          "name": "Thủ Đức",
+          "is_bold": true
+        },
+        {
+          "name": "Tam Bình",
+          "is_bold": true
+        },
+        {
+          "name": "Linh Xuân",
+          "is_bold": true
+        },
+        {
+          "name": "Tăng Nhơn Phú",
+          "is_bold": true
+        },
+        {
+          "name": "Long Bình",
+          "is_bold": true
+        }
       ],
       "backup_wards": [
-        {"name": "Bình Trưng", "is_bold": true},
-        {"name": "Phước Long", "is_bold": true},
-        {"name": "An Khánh", "is_bold": true},
-        {"name": "Dĩ An", "is_bold": false},
-        {"name": "Đông Hòa", "is_bold": false}
+        {
+          "name": "Bình Trưng",
+          "is_bold": true
+        },
+        {
+          "name": "Phước Long",
+          "is_bold": true
+        },
+        {
+          "name": "An Khánh",
+          "is_bold": true
+        },
+        {
+          "name": "Dĩ An",
+          "is_bold": false
+        },
+        {
+          "name": "Đông Hòa",
+          "is_bold": false
+        }
       ]
     },
     "8447": {
@@ -107,18 +191,48 @@
       "city": "Hồ Chí Minh",
       "area": "Tân Phú",
       "primary_wards": [
-        {"name": "Phú Thạnh", "is_bold": true},
-        {"name": "Tây Thạnh", "is_bold": true},
-        {"name": "Tân Sơn Nhì", "is_bold": true},
-        {"name": "Phú Thọ Hòa", "is_bold": true},
-        {"name": "Tân Phú", "is_bold": true}
+        {
+          "name": "Phú Thạnh",
+          "is_bold": true
+        },
+        {
+          "name": "Tây Thạnh",
+          "is_bold": true
+        },
+        {
+          "name": "Tân Sơn Nhì",
+          "is_bold": true
+        },
+        {
+          "name": "Phú Thọ Hòa",
+          "is_bold": true
+        },
+        {
+          "name": "Tân Phú",
+          "is_bold": true
+        }
       ],
       "backup_wards": [
-        {"name": "An Lạc", "is_bold": true},
-        {"name": "Bình Trị Đông", "is_bold": true},
-        {"name": "Bình Hưng Hòa", "is_bold": true},
-        {"name": "Bình Tân", "is_bold": true},
-        {"name": "Tân Tạo", "is_bold": false}
+        {
+          "name": "An Lạc",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Trị Đông",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Hưng Hòa",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Tân",
+          "is_bold": true
+        },
+        {
+          "name": "Tân Tạo",
+          "is_bold": false
+        }
       ]
     },
     "8440": {
@@ -128,19 +242,52 @@
       "city": "Hồ Chí Minh",
       "area": "Gò Vấp",
       "primary_wards": [
-        {"name": "Hạnh Thông", "is_bold": true},
-        {"name": "Gò Vấp", "is_bold": true},
-        {"name": "An Hội Đông", "is_bold": true},
-        {"name": "Thông Tây Hội", "is_bold": true},
-        {"name": "An Hội Tây", "is_bold": true}
+        {
+          "name": "Hạnh Thông",
+          "is_bold": true
+        },
+        {
+          "name": "Gò Vấp",
+          "is_bold": true
+        },
+        {
+          "name": "An Hội Đông",
+          "is_bold": true
+        },
+        {
+          "name": "Thông Tây Hội",
+          "is_bold": true
+        },
+        {
+          "name": "An Hội Tây",
+          "is_bold": true
+        }
       ],
       "backup_wards": [
-        {"name": "Bình Thạnh", "is_bold": true},
-        {"name": "Bình Lợi Trung", "is_bold": true},
-        {"name": "Thới An", "is_bold": true},
-        {"name": "An Phú Đông", "is_bold": true},
-        {"name": "Gia Định", "is_bold": false},
-        {"name": "Thạnh Mỹ Tây", "is_bold": false}
+        {
+          "name": "Bình Thạnh",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Lợi Trung",
+          "is_bold": true
+        },
+        {
+          "name": "Thới An",
+          "is_bold": true
+        },
+        {
+          "name": "An Phú Đông",
+          "is_bold": true
+        },
+        {
+          "name": "Gia Định",
+          "is_bold": false
+        },
+        {
+          "name": "Thạnh Mỹ Tây",
+          "is_bold": false
+        }
       ]
     },
     "8448": {
@@ -150,19 +297,52 @@
       "city": "Hồ Chí Minh",
       "area": "Bình Thạnh",
       "primary_wards": [
-        {"name": "Gia Định", "is_bold": true},
-        {"name": "Bình Thạnh", "is_bold": true},
-        {"name": "Thạnh Mỹ Tây", "is_bold": true},
-        {"name": "Cầu Kiệu", "is_bold": false},
-        {"name": "Phú Nhuận", "is_bold": false},
-        {"name": "Đức Nhuận", "is_bold": false}
+        {
+          "name": "Gia Định",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Thạnh",
+          "is_bold": true
+        },
+        {
+          "name": "Thạnh Mỹ Tây",
+          "is_bold": true
+        },
+        {
+          "name": "Cầu Kiệu",
+          "is_bold": false
+        },
+        {
+          "name": "Phú Nhuận",
+          "is_bold": false
+        },
+        {
+          "name": "Đức Nhuận",
+          "is_bold": false
+        }
       ],
       "backup_wards": [
-        {"name": "An Khánh", "is_bold": true},
-        {"name": "Cầu Kiệu", "is_bold": true},
-        {"name": "Phú Nhuận", "is_bold": true},
-        {"name": "Bình Quới", "is_bold": true},
-        {"name": "Bình Lợi Trung", "is_bold": true}
+        {
+          "name": "An Khánh",
+          "is_bold": true
+        },
+        {
+          "name": "Cầu Kiệu",
+          "is_bold": true
+        },
+        {
+          "name": "Phú Nhuận",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Quới",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Lợi Trung",
+          "is_bold": true
+        }
       ]
     },
     "8467": {
@@ -172,19 +352,72 @@
       "city": "Hồ Chí Minh",
       "area": "Quận 11",
       "primary_wards": [
-        {"name": "Minh Phụng", "is_bold": true},
-        {"name": "Bình Thới", "is_bold": true},
-        {"name": "Hòa Bình", "is_bold": true},
-        {"name": "Phú Thọ", "is_bold": true},
-        {"name": "Bàn Cờ", "is_bold": true},
-        {"name": "Chợ Lớn", "is_bold": false},
-        {"name": "Hòa Hưng", "is_bold": false}
+        {
+          "name": "Minh Phụng",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Thới",
+          "is_bold": true
+        },
+        {
+          "name": "Hòa Bình",
+          "is_bold": true
+        },
+        {
+          "name": "Phú Thọ",
+          "is_bold": true
+        },
+        {
+          "name": "Bàn Cờ",
+          "is_bold": true
+        },
+        {
+          "name": "Chợ Lớn",
+          "is_bold": false
+        },
+        {
+          "name": "Hòa Hưng",
+          "is_bold": false
+        }
       ],
       "backup_wards": [
-        {"name": "Diên Hồng", "is_bold": true},
-        {"name": "Vườn Lài", "is_bold": true},
-        {"name": "Bến Thành", "is_bold": true},
-        {"name": "Xuân Hòa", "is_bold": true}
+        {
+          "name": "An Khánh",
+          "is_bold": true
+        },
+        {
+          "name": "Cầu Kiệu",
+          "is_bold": true
+        },
+        {
+          "name": "Phú Nhuận",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Quới",
+          "is_bold": true
+        },
+        {
+          "name": "Bình Lợi Trung",
+          "is_bold": true
+        },
+        {
+          "name": "Diên Hồng",
+          "is_bold": true
+        },
+        {
+          "name": "Vườn Lài",
+          "is_bold": true
+        },
+        {
+          "name": "Bến Thành",
+          "is_bold": true
+        },
+        {
+          "name": "Xuân Hòa",
+          "is_bold": true
+        }
       ]
     },
     "8462": {
@@ -194,20 +427,96 @@
       "city": "Hồ Chí Minh",
       "area": "Quận 12",
       "primary_wards": [
-        {"name": "Thới An", "is_bold": true},
-        {"name": "Tân Thới Hiệp", "is_bold": true},
-        {"name": "Gò Vấp", "is_bold": true},
-        {"name": "Đông Hưng Thuận", "is_bold": true},
-        {"name": "Trung Mỹ Tây", "is_bold": false},
-        {"name": "Đông Thạnh", "is_bold": false}
+        {
+          "name": "Thới An",
+          "is_bold": true
+        },
+        {
+          "name": "Tân Thới Hiệp",
+          "is_bold": true
+        },
+        {
+          "name": "Gò Vấp",
+          "is_bold": true
+        },
+        {
+          "name": "Đông Hưng Thuận",
+          "is_bold": true
+        },
+        {
+          "name": "Trung Mỹ Tây",
+          "is_bold": false
+        },
+        {
+          "name": "Đông Thạnh",
+          "is_bold": false
+        }
       ],
       "backup_wards": [
-        {"name": "Thông Tây Hội", "is_bold": true},
-        {"name": "An Hội Tây", "is_bold": true},
-        {"name": "Lái Thiêu", "is_bold": false},
-        {"name": "Bà Điểm", "is_bold": false},
-        {"name": "Cầu Kiệu", "is_bold": false}
+        {
+          "name": "Thông Tây Hội",
+          "is_bold": true
+        },
+        {
+          "name": "An Hội Tây",
+          "is_bold": true
+        },
+        {
+          "name": "Tân Sơn",
+          "is_bold": true
+        },
+        {
+          "name": "An Phú Đông",
+          "is_bold": false
+        },
+        {
+          "name": "Bà Điểm",
+          "is_bold": false
+        },
+        {
+          "name": "Cầu Kiệu",
+          "is_bold": false
+        }
       ]
+    }
+  },
+  "special_notes": {
+    "tan_binh_cluster": {
+      "description": "Quận Tân Bình cũ (xung quanh công ty), backup được nhiều bạn trừ Thái Hiếu, Khang, Phát",
+      "wards": [
+        "Tân Sơn Hòa",
+        "Tân Sơn Nhất",
+        "Tân Hòa",
+        "Bảy Hiền",
+        "Tân Bình",
+        "Tân Sơn"
+      ],
+      "eligible_staff": [
+        "8447",
+        "8440",
+        "8448",
+        "8467"
+      ]
+    },
+    "extra_districts_contingency": {
+      "description": "Các quận không có trong danh sách nhưng vẫn có thể đi, tùy tình hình data biến động",
+      "q3": [
+        "Bàn Cờ",
+        "Xuân Hòa",
+        "Nhiêu Lộc"
+      ],
+      "q5": [
+        "Chợ Quán",
+        "An Đông",
+        "Chợ Lớn"
+      ],
+      "q6": [
+        "Bình Tây",
+        "Bình Tiên",
+        "Bình Phú",
+        "Phú Lâm"
+      ],
+      "q1_q4_q7_note": "Q1 gần nhưng data chủ yếu hoạt động về đêm; Q4, Q7 khá xa, nếu có ticket ưu tiên 8448 (Minh)"
     }
   }
 }

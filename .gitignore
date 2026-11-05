@@ -42,3 +42,6 @@ scratch/
 desktop.ini
 Thumbs.db
 .DS_Store
+
+sc_renew_seen_tickets.json
+*_seen_*.json
