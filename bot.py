@@ -3269,6 +3269,20 @@ def handle_checktk_command(message):
             )
     threading.Thread(target=run_checktk, daemon=True).start()
 
+@bot.message_handler(commands=['checkrenew', 'taiky', 'sctaiky'])
+def handle_checkrenew_command(message):
+    status_msg = bot.reply_to(message, "⏳ **Đang quét Ticket SC Group từ Team Tái Ký...**", parse_mode="Markdown")
+    def run_checkrenew():
+        import sc_renew_monitor
+        cnt = sc_renew_monitor.scan_and_notify_sc_renew(is_warmup=False)
+        bot.edit_message_text(
+            chat_id=message.chat.id,
+            message_id=status_msg.message_id,
+            text=f"✅ **Đã quét xong Ticket SC Group Tái Ký!**\n- Số ticket mới được gửi Google Chat: `{cnt}`",
+            parse_mode="Markdown"
+        )
+    threading.Thread(target=run_checkrenew, daemon=True).start()
+
 @bot.message_handler(commands=['updatesheet', 'sheet', 'capnhatsheet'])
 def handle_updatesheet_command(message):
     status_msg = bot.reply_to(message, "⏳ **Đang quét CRM và tự động cập nhật Google Sheet Miền Nam...**", parse_mode="Markdown")
@@ -3612,6 +3626,10 @@ def handle_text(message):
 
     if text.lower() in ["checktk", "/checktk", "ticket", "/ticket", "gchat_tk", "/gchat_tk"]:
         handle_checktk_command(message)
+        return
+
+    if text.lower() in ["checkrenew", "/checkrenew", "taiky", "/taiky", "sctaiky", "/sctaiky"]:
+        handle_checkrenew_command(message)
         return
 
     if text.lower() in [
@@ -4226,6 +4244,14 @@ if __name__ == "__main__":
 
     threading.Thread(target=crm_keep_alive_daemon, daemon=True).start()
     print("💚 Đã kích hoạt luồng tự động nuôi phiên CRM 24/7 (Keep-Alive Heartbeat).")
+
+    # Kích hoạt luồng quét tự động Ticket Tái Ký SC Group mỗi 3 phút bắn Google Chat
+    try:
+        import sc_renew_monitor
+        threading.Thread(target=sc_renew_monitor.sc_renew_monitor_loop, args=(180,), daemon=True).start()
+        print("🔔 Đã kích hoạt luồng tự động quét Ticket Tái Ký SC Group mỗi 3 phút bắn Google Chat.")
+    except Exception as me:
+        print(f"⚠️ [SC Renew Monitor] Lỗi kích hoạt luồng: {me}")
 
     print("Bot đang chạy và lắng nghe tin nhắn...")
     while True:

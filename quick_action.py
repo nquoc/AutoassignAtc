@@ -2745,5 +2745,28 @@ if __name__ == '__main__':
         import auto_sheet_updater
         s, msg = auto_sheet_updater.remove_tan_binh_backup_sheet()
         print(msg)
+    elif cmd in ["checkrenew", "renew", "sctaiky", "taiky"]:
+        import sc_renew_monitor
+        if len(args) > 1 and args[1].lower() in ["send", "test"]:
+            print("🚀 Đang kiểm tra và gửi thử thông báo Ticket Tái Ký lên Google Chat...")
+            headers = sc_renew_monitor.get_headers()
+            url_view = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322"
+            req = urllib.request.Request(url_view, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                p_html = resp.read().decode('utf-8', errors='ignore')
+            matches = re.findall(r'<tr[^>]+class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>', p_html)
+            found = False
+            for mid in matches:
+                dt = sc_renew_monitor.get_ticket_detail(mid, headers)
+                if dt and sc_renew_monitor.is_renew_creator(dt.get("created_by", "")):
+                    success = sc_renew_monitor.send_gchat_renew(dt, dry_run=False)
+                    print(f"Gửi thông báo {dt['ticket_no']}: {success}")
+                    found = True
+                    break
+            if not found:
+                print("Không tìm thấy ticket nào của Team Tái Ký trong SC Group để gửi thử.")
+        else:
+            cnt = sc_renew_monitor.scan_and_notify_sc_renew(is_warmup=False)
+            print(f"Đã quét xong, số thông báo gửi: {cnt}")
     else:
         print(f"Unknown command: {args}")
