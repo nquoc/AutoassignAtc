@@ -119,9 +119,9 @@ def map_wards_to_staff(unassigned_wards, master_data):
                 found_code = "8447" # Duy (Cụm Tân Bình cũ)
             elif any(k in clean_l for k in ["hóc môn", "hoc mon", "q12"]) or "quận 12" in raw_l or clean_w == "12":
                 found_code = "8462" # Khang (Quận 12 / Hóc Môn)
-            elif any(k in clean_l for k in ["sài gòn", "sai gon", "bến nghé", "ben nghe", "quận 4", "quận 7"]):
-                found_code = "8448" # Minh (Trung tâm & Q4, Q7)
-            elif any(k in clean_l for k in ["vườn lài", "vuon lai", "diên hồng", "dien hong", "chợ quán", "cho quan", "an đông", "an dong", "bình tây", "binh tay", "bình tiên", "binh tien", "bình phú", "binh phu", "phú lâm", "phu lam", "nhiêu lộc", "nhieu loc"]):
+            elif any(k in clean_l for k in ["sài gòn", "sai gon", "bến nghé", "ben nghe", "quận 4", "quận 7", "nhiêu lộc", "nhieu loc"]):
+                found_code = "8448" # Minh (Trung tâm, Nhiêu Lộc, Q4, Q7)
+            elif any(k in clean_l for k in ["vườn lài", "vuon lai", "diên hồng", "dien hong", "chợ quán", "cho quan", "an đông", "an dong", "bình tây", "binh tay", "bình tiên", "binh tien", "bình phú", "binh phu", "phú lâm", "phu lam"]):
                 found_code = "8467" # Đạt (Q10, Q5, Q6, Q3)
                 
         if found_code:

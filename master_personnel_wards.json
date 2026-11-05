@@ -2,7 +2,7 @@
   "system_info": {
     "name": "Hệ thống điều phối data ATC - CS Hồ Chí Minh & Đồng Nai",
     "version": "2.1",
-    "updated_at": "2026-11-05T16:05:00+07:00",
+    "updated_at": "2026-11-05T16:06:00+07:00",
     "layout_architecture": {
       "block_1_provinces": "Dòng 2 đến trước Vũng Tàu (Cần Thơ, Cà Mau, Gia Lai, Lâm Đồng...)",
       "block_2_vung_tau_fixed": "Cố định ở trên: 4 phường Vũng Tàu (Tam Thắng, Vũng Tàu, Rạch Dừa, Phước Thắng - 8484 ANH Nam)",
@@ -307,6 +307,10 @@
         },
         {
           "name": "Thạnh Mỹ Tây",
+          "is_bold": true
+        },
+        {
+          "name": "Nhiêu Lộc",
           "is_bold": true
         },
         {
