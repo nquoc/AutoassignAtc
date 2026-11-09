@@ -4144,67 +4144,102 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"⚠️ [AutoAssign] Lỗi gửi Telegram tự động: {e}", flush=True)
 
+    def load_scheduler_state():
+        state_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scheduler_state.json")
+        if os.path.exists(state_file):
+            try:
+                with open(state_file, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
+
+    def save_scheduler_state(state):
+        state_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scheduler_state.json")
+        try:
+            with open(state_file, "w", encoding="utf-8") as f:
+                json.dump(state, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
     def daily_report_scheduler():
-        reported_today_18h = None
-        reported_today_07h = None
-        reported_today_20h = None
-        auto_assigned_today_06h30 = None
-        auto_assigned_today_20h30 = None
-        auto_sheet_updated_today_21h = None
+        state = load_scheduler_state()
+
         while True:
             try:
                 now_str = time.strftime("%H:%M")
                 today_str = time.strftime("%Y-%m-%d")
-                
-                # 07:00 AM SLA Report
-                if now_str == "07:00" and reported_today_07h != today_str:
-                    print(f"⏰ [Scheduler] Đã đến 07:00 ({today_str}), bắt đầu tự động gửi báo cáo SLA lên Google Chat...")
-                    success, res_msg = send_sla_gchat_report()
-                    if success:
-                        reported_today_07h = today_str
-                        print(f"🎉 [Scheduler] Báo cáo SLA 07:00 ngày {today_str} đã gửi Google Chat thành công!")
 
                 # 06:30 AM Auto-assign (< 10 ATC treo -> Đẩy thêm 8 data)
-                if now_str == "06:30" and auto_assigned_today_06h30 != today_str:
-                    print(f"⏰ [Scheduler] Đã đến 06:30 ({today_str}), bắt đầu tự động quét & chia data (< 10 ATC)...")
-                    auto_assigned_today_06h30 = today_str
-                    import quick_action
-                    success, r_msg, _ = quick_action.do_auto_assign_under_10(batch_size=8, threshold=10, dry_run=False)
-                    send_auto_assign_notification(r_msg)
-                    print(f"🎉 [Scheduler] Đã hoàn thành tự động chia data 06:30 sáng ngày {today_str}!")
+                if "06:30" <= now_str < "12:00" and state.get("auto_assigned_today_06h30") != today_str:
+                    state["auto_assigned_today_06h30"] = today_str
+                    save_scheduler_state(state)
+                    print(f"⏰ [Scheduler] Bắt đầu tự động quét & chia data 06:30 (< 10 ATC) lúc {now_str}...")
+                    try:
+                        import quick_action
+                        success, r_msg, _ = quick_action.do_auto_assign_under_10(batch_size=8, threshold=10, dry_run=False)
+                        send_auto_assign_notification(r_msg)
+                        print(f"🎉 [Scheduler] Đã hoàn thành tự động chia data 06:30 ngày {today_str}!")
+                    except Exception as e:
+                        print(f"❌ [Scheduler] Lỗi chia data 06:30: {e}")
+
+                # 07:00 AM SLA Report
+                if "07:00" <= now_str < "12:00" and state.get("reported_today_07h") != today_str:
+                    state["reported_today_07h"] = today_str
+                    save_scheduler_state(state)
+                    print(f"⏰ [Scheduler] Bắt đầu gửi báo cáo SLA 07:00 lên Google Chat lúc {now_str}...")
+                    try:
+                        success, res_msg = send_sla_gchat_report()
+                        if success:
+                            print(f"🎉 [Scheduler] Báo cáo SLA 07:00 ngày {today_str} đã gửi Google Chat thành công!")
+                    except Exception as e:
+                        print(f"❌ [Scheduler] Lỗi gửi báo cáo SLA 07:00: {e}")
 
                 # 18:00 PM Daily Report
-                if now_str == "18:00" and reported_today_18h != today_str:
-                    print(f"⏰ [Scheduler] Đã đến 18:00 ({today_str}), bắt đầu tự động bắn báo cáo lên Google Chat...")
-                    success, res_msg = send_google_chat_report()
-                    if success:
-                        reported_today_18h = today_str
-                        print(f"🎉 [Scheduler] Báo cáo 18:00 ngày {today_str} đã gửi Google Chat thành công!")
+                if "18:00" <= now_str < "22:00" and state.get("reported_today_18h") != today_str:
+                    state["reported_today_18h"] = today_str
+                    save_scheduler_state(state)
+                    print(f"⏰ [Scheduler] Bắt đầu bắn báo cáo ngày 18:00 lên Google Chat lúc {now_str}...")
+                    try:
+                        success, res_msg = send_google_chat_report()
+                        if success:
+                            print(f"🎉 [Scheduler] Báo cáo 18:00 ngày {today_str} đã gửi Google Chat thành công!")
+                    except Exception as e:
+                        print(f"❌ [Scheduler] Lỗi gửi báo cáo 18:00: {e}")
 
                 # 20:00 PM Ticket Treo Report (tag đích danh)
-                if now_str == "20:00" and reported_today_20h != today_str:
-                    print(f"⏰ [Scheduler] Đã đến 20:00 ({today_str}), bắt đầu tự động bắn báo cáo Ticket treo lên Google Chat...")
-                    import quick_action
-                    success, res_msg = quick_action.do_send_ticket_gchat()
-                    if success:
-                        reported_today_20h = today_str
-                        print(f"🎉 [Scheduler] Báo cáo Ticket treo 20:00 ngày {today_str} đã gửi Google Chat thành công!")
-                    else:
-                        print(f"❌ [Scheduler] Báo cáo Ticket treo 20:00 thất bại: {res_msg}")
+                if "20:00" <= now_str < "22:30" and state.get("reported_today_20h") != today_str:
+                    state["reported_today_20h"] = today_str
+                    save_scheduler_state(state)
+                    print(f"⏰ [Scheduler] Bắt đầu bắn báo cáo Ticket treo 20:00 lên Google Chat lúc {now_str}...")
+                    try:
+                        import quick_action
+                        success, res_msg = quick_action.do_send_ticket_gchat()
+                        if success:
+                            print(f"🎉 [Scheduler] Báo cáo Ticket treo 20:00 ngày {today_str} đã gửi Google Chat thành công!")
+                        else:
+                            print(f"❌ [Scheduler] Báo cáo Ticket treo 20:00 thất bại: {res_msg}")
+                    except Exception as e:
+                        print(f"❌ [Scheduler] Lỗi báo cáo Ticket treo 20:00: {e}")
 
                 # 20:30 PM Auto-assign (< 10 ATC treo -> Đẩy thêm 8 data)
-                if now_str == "20:30" and auto_assigned_today_20h30 != today_str:
-                    print(f"⏰ [Scheduler] Đã đến 20:30 ({today_str}), bắt đầu tự động quét & chia data (< 10 ATC)...")
-                    auto_assigned_today_20h30 = today_str
-                    import quick_action
-                    success, r_msg, _ = quick_action.do_auto_assign_under_10(batch_size=8, threshold=10, dry_run=False)
-                    send_auto_assign_notification(r_msg)
-                    print(f"🎉 [Scheduler] Đã hoàn thành tự động chia data 20:30 tối ngày {today_str}!")
+                if "20:30" <= now_str < "23:00" and state.get("auto_assigned_today_20h30") != today_str:
+                    state["auto_assigned_today_20h30"] = today_str
+                    save_scheduler_state(state)
+                    print(f"⏰ [Scheduler] Bắt đầu tự động quét & chia data 20:30 (< 10 ATC) lúc {now_str}...")
+                    try:
+                        import quick_action
+                        success, r_msg, _ = quick_action.do_auto_assign_under_10(batch_size=8, threshold=10, dry_run=False)
+                        send_auto_assign_notification(r_msg)
+                        print(f"🎉 [Scheduler] Đã hoàn thành tự động chia data 20:30 tối ngày {today_str}!")
+                    except Exception as e:
+                        print(f"❌ [Scheduler] Lỗi chia data 20:30: {e}")
 
                 # 21:00 PM Auto-update Google Sheet Miền Nam (Sau khi auto-assign 20h30 xong)
-                if now_str == "21:00" and auto_sheet_updated_today_21h != today_str:
-                    print(f"⏰ [Scheduler] Đã đến 21:00 ({today_str}), bắt đầu tự động cập nhật Google Sheet Miền Nam...")
-                    auto_sheet_updated_today_21h = today_str
+                if "21:00" <= now_str <= "23:59" and state.get("auto_sheet_updated_today_21h") != today_str:
+                    state["auto_sheet_updated_today_21h"] = today_str
+                    save_scheduler_state(state)
+                    print(f"⏰ [Scheduler] Bắt đầu tự động cập nhật Google Sheet Miền Nam lúc {now_str} (Hẹn giờ 21:00)...")
                     try:
                         import auto_sheet_updater
                         saved_chat_id = None
@@ -4216,13 +4251,15 @@ if __name__ == "__main__":
                             except: pass
                         success, res_msg = auto_sheet_updater.run_auto_update_hcm_sheet(bot=bot, chat_id=saved_chat_id)
                         if success:
-                            print(f"🎉 [Scheduler] Đã tự động cập nhật Google Sheet 21:00 ngày {today_str} thành công!")
+                            print(f"🎉 [Scheduler] Đã tự động cập nhật Google Sheet ngày {today_str} thành công!")
                         else:
-                            print(f"❌ [Scheduler] Cập nhật Google Sheet 21:00 thất bại: {res_msg}")
+                            print(f"❌ [Scheduler] Cập nhật Google Sheet thất bại: {res_msg}")
                     except Exception as e:
-                        print(f"❌ [Scheduler] Lỗi cập nhật Google Sheet 21:00: {e}")
+                        print(f"❌ [Scheduler] Lỗi cập nhật Google Sheet: {e}")
+
             except Exception as e:
                 print(f"❌ [Scheduler] Lỗi trong scheduler: {e}")
+
             time.sleep(30)
 
     threading.Thread(target=daily_report_scheduler, daemon=True).start()
