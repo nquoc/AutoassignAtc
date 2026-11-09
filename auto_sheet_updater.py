@@ -224,11 +224,52 @@ def run_auto_update_hcm_sheet(bot=None, chat_id=None):
                 "wards": wards
             })
             
-        # 3. Deduplicate wards across staff (Primary has priority over Backup, earlier staff has priority)
+        # 3. Open Google Sheet & determine dynamic start row (handling Đồng Nai / Vũng Tàu)
+        target_sheet_id = master["system_info"]["sheets"]["target_sheet_id"]
+        target_worksheet = master["system_info"]["sheets"]["target_worksheet"]
+        
+        gc = gspread.service_account(filename=sa_file)
+        sh = gc.open_by_key(target_sheet_id)
+        ws = sh.worksheet(target_worksheet)
+        
+        start_row = 49
+        stt = 51
+        has_dong_nai = False
+        try:
+            col_b_vals = ws.col_values(2) # Column B: city
+            col_d_vals = ws.col_values(4) # Column D: assignee
+            col_a_vals = ws.col_values(1) # Column A: STT
+            
+            last_fixed_row = None
+            dn_indices = [i for i, v in enumerate(col_b_vals) if "đồng nai" in str(v).lower()]
+            if dn_indices:
+                has_dong_nai = True
+                last_fixed_row = max(dn_indices) + 1
+            else:
+                vt_indices = [i for i, v in enumerate(col_d_vals) if "vũng tàu" in str(v).lower() or "8484" in str(v).lower()]
+                if vt_indices:
+                    last_fixed_row = max(vt_indices) + 1
+                else:
+                    ct_indices = [i for i, v in enumerate(col_b_vals) if "cần thơ" in str(v).lower()]
+                    if ct_indices:
+                        last_fixed_row = max(ct_indices) + 1
+                        
+            if last_fixed_row:
+                start_row = last_fixed_row + 1
+                if last_fixed_row <= len(col_a_vals):
+                    col_a_val = str(col_a_vals[last_fixed_row - 1]).strip()
+                    if col_a_val.isdigit():
+                        stt = int(col_a_val) + 1
+        except Exception as det_e:
+            print(f"ℹ️ [AutoSheet] Dùng start_row mặc định ({start_row}): {det_e}", flush=True)
+            
+        # 4. Deduplicate wards across staff (Primary has priority over Backup, earlier staff has priority)
         used_wards = set()
-        # Reserved wards from fixed blocks (Đồng Nai & Vũng Tàu)
-        for block_key in ["vung_tau", "dong_nai"]:
-            for bw in master.get("special_fixed_blocks", {}).get(block_key, {}).get("wards", []):
+        # Reserved wards from fixed blocks (Vũng Tàu, and Đồng Nai only if present on sheet)
+        for bw in master.get("special_fixed_blocks", {}).get("vung_tau", {}).get("wards", []):
+            used_wards.add(bw.strip().lower())
+        if has_dong_nai:
+            for bw in master.get("special_fixed_blocks", {}).get("dong_nai", {}).get("wards", []):
                 used_wards.add(bw.strip().lower())
                 
         hcm_rows = []
@@ -247,31 +288,6 @@ def run_auto_update_hcm_sheet(bot=None, chat_id=None):
                     
             item["final_wards"] = assigned_this_staff
             final_assigned_count[code] = len(assigned_this_staff)
-            
-        # 4. Open Google Sheet & determine dynamic start row
-        target_sheet_id = master["system_info"]["sheets"]["target_sheet_id"]
-        target_worksheet = master["system_info"]["sheets"]["target_worksheet"]
-        
-        gc = gspread.service_account(filename=sa_file)
-        sh = gc.open_by_key(target_sheet_id)
-        ws = sh.worksheet(target_worksheet)
-        
-        # Dynamically locate the start row right after Đồng Nai (block 3)
-        start_row = 52
-        stt = 51
-        try:
-            col_b_vals = ws.col_values(2) # Column B: city
-            dn_indices = [i for i, v in enumerate(col_b_vals) if "đồng nai" in str(v).lower()]
-            if dn_indices:
-                last_dn_row = max(dn_indices) + 1 # 1-based row index
-                start_row = last_dn_row + 1
-                col_a_val = ws.cell(last_dn_row, 1).value
-                if col_a_val and str(col_a_val).strip().isdigit():
-                    stt = int(str(col_a_val).strip()) + 1
-        except Exception as det_e:
-            print(f"ℹ️ [AutoSheet] Dùng start_row mặc định (52): {det_e}", flush=True)
-            start_row = 52
-            stt = 51
             
         # Build rows to write
         for item in summary:
