@@ -84,9 +84,16 @@ File này cung cấp toàn bộ kiến thức, quy tắc nghiệp vụ, bảng m
    - Nếu cần cập nhật đồng thời nhiều trường (ví dụ vừa sửa Ghi chú sao kê vừa đổi Tình trạng sang Chờ Xét Duyệt): **BẮT BUỘC TÁCH THÀNH 2 (HOẶC NHIỀU) REQUEST `SaveAjax` RIÊNG BIỆT**.
    - ⛔ **TUYỆT ĐỐI KHÔNG SUBMIT FORM EDITVIEW TOÀN PHẦN (`action=Save`)**: vì trên giao diện form web CRM, các trường dropdown khác (như `Cơ hội` / `potentialname`, `Trạng thái bảo lưu`, `Đối thủ`,...) thường có giá trị mặc định (như auto-select *"Hợp đồng phần mềm"* thay vì *"Hợp đồng phần cứng"*), nếu submit toàn form sẽ làm ghi đè sai lệch dữ liệu!
 
-9. 📢 **QUY TẮC BẮN THÔNG BÁO BÀN GIAO GOOGLE CHAT (TRANSFER NOTIFICATION RULE - BẮT BUỘC)**:
-   - Khi bàn giao thành công Ticket & ATC (qua tin nhắn Bot Telegram hoặc lệnh CLI `transfer`): **TỰ ĐỘNG BẮN THÔNG BÁO LÊN GOOGLE CHAT VÀ TAG ĐÍCH DANH NHÂN SỰ NHẬN** (`<users/{gid}>`) qua hàm `send_transfer_gchat` dựa trên bảng ánh xạ `gchat_user_map.json`.
-   - Giúp nhân sự phụ trách nhận được thông báo push ngay tức thì trên điện thoại / máy tính để vào xử lý ticket kịp thời.
+9. 🔕 **QUY TẮC BẮN THÔNG BÁO GOOGLE CHAT & TAG NHÂN SỰ (KHÔNG TỰ TIỆN TAG/BẮN GCHAT)**:
+   - ⛔ **TUYỆT ĐỐI KHÔNG TỰ TIỆN BẮN THÔNG BÁO HOẶC TAG ĐÍCH DANH NHÂN SỰ LÊN GOOGLE CHAT** khi người dùng chỉ yêu cầu chuyển ATC, chia data, gán địa bàn thông thường (đặc biệt là buổi tối, ngoài giờ hành chính hoặc khi chia hàng loạt) tránh làm phiền/đổ chuông điện thoại nhân sự gây bức xúc!
+   - 📢 **CHỈ ĐƯỢC BẮN GCHAT / TAG NHÂN SỰ KHI VÀ CHỈ KHI**:
+     1. Người dùng có lệnh rõ ràng bằng chữ: `"bắn gchat"`, `"tag"`, `"báo lên group"`, `"thông báo nó"`,...
+     2. Hoặc lệnh CLI truyền cờ `--gchat` / `--tag` có chủ đích.
+   - Mọi thao tác bàn giao mặc định: **CHỈ CẬP NHẬT TRÊN CRM VÀ BÁO CÁO LẠI TRONG ĐOẠN CHAT VỚI USER**, giữ im lặng 100% trên các kênh chung.
+
+10. 📋 **QUY TẮC ĐỊNH DẠNG MÃ TICKET DỄ COPY (TICKET COPYABILITY RULE - BẮT BUỘC)**:
+    - Khi báo cáo danh sách hoặc chi tiết Ticket: **LUÔN ĐỂ MÃ TICKET Ở DẠNG INLINE CODE RIÊNG BIỆT** (ví dụ: `TT9154910` — [Link CRM](https://...)), **TUYỆT ĐỐI KHÔNG bọc hyperlink trực tiếp lên toàn bộ mã ticket** (như `[TT9154910](...)`) khiến người dùng trên điện thoại hoặc máy tính bấm vào bị mở trình duyệt thay vì copy được mã!
+    - Giúp người dùng chỉ cần chạm 1 chạm hoặc double-click là copy ngay lập tức mã Ticket để gửi tin nhắn hoặc chạy lệnh chuyển Owner.
 
 ---
 
@@ -121,6 +128,7 @@ File này cung cấp toàn bộ kiến thức, quy tắc nghiệp vụ, bảng m
 | **8280** | `10675` | Vũ Minh Đức - HNI |
 | **8246** | `6881` | Lê Văn Bách - HNI |
 | **8492** | `13460` | Nguyễn Thành Nam - HNI |
+| **8493** | `13409` | Đinh Hoàng Linh - HNI |
 | **8845** / `sc` | `8845` | SC Group (Hàng đợi chung SC) |
 
 ---

@@ -43,6 +43,7 @@ def _load_staff_map():
         "8280": ("10675", "Vũ Minh Đức - HNI"),
         "8246": ("6881", "Lê Văn Bách - HNI"),
         "8492": ("13460", "Nguyễn Thành Nam - HNI"),
+        "8493": ("13409", "Đinh Hoàng Linh - HNI"),
         "8483": ("13740", "Ngô Trọng Nam Khánh - Customer Success"),
         "8201": ("11216", "Nguyễn Ái Quốc - Coacher"),
         "8845": ("8845", "SC Group"),
@@ -1487,7 +1488,7 @@ def do_check_sc_group(full_desc=False):
             desc_block = f"   • **Mô tả**: `{desc_short}`\n"
 
         lines.append(
-            f"{i}. **[{d['ticket_no']}]({d['crm_url']})**\n"
+            f"{i}. 🎫 `{d['ticket_no']}` — [Link CRM]({d['crm_url']})\n"
             f"   • **Tên GH**: `{d['store']}` *(Retailer ID: `{d['retailer_id']}`)*\n"
             f"   • **Khách hàng**: {d['contact']}{phone_str}\n"
             f"   • **Người tạo**: **{d['created_by']}**\n"
@@ -2444,7 +2445,7 @@ def do_check_single_ticket(ticket_query):
         pass
 
     res = (
-        f"🎫 **CHI TIẾT TICKET [{t_no}]({detail_url})**\n"
+        f"🎫 **CHI TIẾT TICKET `{t_no}`** — [Link CRM]({detail_url})\n"
         f"• 📝 **Tiêu đề**: `{title}`\n"
         f"• 🚦 **Trạng thái**: `{status}`\n"
         f"• 👤 **Người xử lý (Owner)**: `{owner}`\n"
@@ -2662,7 +2663,7 @@ if __name__ == '__main__':
         store_name = res_t[6] if len(res_t) > 6 else ""
         staff_info = STAFF_MAP.get(str(args[2]), (args[2], args[2]))[1]
         print(f"TRANSFER_SUCCESS: rec_id={rec_id}, ticket={ticket_no}, store={store_name}, retailer={retailer_id}, atcs={atcs}, staff={args[2]}, desc={desc}")
-        if "--no-gchat" not in args:
+        if "--gchat" in args or "--tag" in args:
             send_transfer_gchat(rec_id, ticket_no, store_name, retailer_id, args[2], staff_info, atcs, latest_atc, desc)
     elif cmd == "reject" and len(args) >= 2:
         cmt = args[2] if len(args) > 2 else "khu vực không có SC"
