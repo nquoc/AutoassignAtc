@@ -100,7 +100,7 @@ def get_ticket_detail(rid: str, headers=None) -> dict:
             dt_html = resp.read().decode('utf-8', errors='ignore')
 
         m_tno = re.search(r'id=["\']HelpDesk_detailView_fieldValue_ticket_no["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
-        tno = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_tno.group(1)).strip()) if m_tno else rid
+        tno = re.sub(r'\s+', ' ', html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_tno.group(1)))).strip() if m_tno else rid
         
         m_cf_web = re.search(r'id=["\']HelpDesk_detailView_fieldValue_cf_website["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
         store = ""
@@ -110,16 +110,29 @@ def get_ticket_detail(rid: str, headers=None) -> dict:
             if not store:
                 m_sp = re.search(r'<span[^>]*class=["\']value["\'][^>]*>(.*?)</span>', m_cf_web.group(1), re.DOTALL)
                 store = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_sp.group(1) if m_sp else m_cf_web.group(1))).strip()
+        store = re.sub(r'\s+', ' ', store).strip()
         
         m_contact = re.search(r'id=["\']HelpDesk_detailView_fieldValue_contact_id["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
-        contact = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_contact.group(1)).strip()) if m_contact else ""
+        contact_raw = m_contact.group(1) if m_contact else ""
+        contact = re.sub(r'\s+', ' ', html_lib.unescape(re.sub(r'<[^>]+>', ' ', contact_raw))).strip() if m_contact else ""
         if not store: store = contact
         
         m_ret = re.search(r'id=["\']HelpDesk_detailView_fieldValue_retailer_id["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
-        ret = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_ret.group(1)).strip()) if m_ret else ""
+        ret = re.sub(r'\s+', ' ', html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_ret.group(1)))).strip() if m_ret else ""
         
         m_title = re.search(r'id=["\']HelpDesk_detailView_fieldValue_ticket_title["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
-        title = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_title.group(1)).strip()) if m_title else ""
+        title = re.sub(r'\s+', ' ', html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_title.group(1)))).strip() if m_title else ""
+
+        m_prio = re.search(r'id=["\']HelpDesk_detailView_fieldValue_ticketpriorities["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
+        priority = ""
+        if m_prio:
+            m_p_sel = re.search(r'<option[^>]*selected[^>]*>(.*?)</option>', m_prio.group(1), re.DOTALL)
+            if m_p_sel:
+                priority = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_p_sel.group(1))).strip()
+            else:
+                m_p_sp = re.search(r'<span[^>]*class=["\'][^"\']*value[^"\']*["\'][^>]*>(.*?)</span>', m_prio.group(1), re.DOTALL)
+                priority = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_p_sp.group(1) if m_p_sp else m_prio.group(1))).strip()
+        priority = re.sub(r'\s+', ' ', priority).strip()
 
         m_desc = re.search(r'id=["\']HelpDesk_detailView_fieldValue_description["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
         if m_desc:
@@ -131,14 +144,23 @@ def get_ticket_detail(rid: str, headers=None) -> dict:
         else:
             desc = ""
 
-        m_crt_time = re.search(r'Thời gian tạo.*?<td[^>]*class=["\']fieldValue[^"\']*["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
-        crt_time = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_crt_time.group(1)).strip()) if m_crt_time else ""
+        m_crt_time = re.search(r'id=["\']HelpDesk_detailView_fieldValue_createdtime["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL) or re.search(r'Thời gian tạo.*?<td[^>]*class=["\']fieldValue[^"\']*["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
+        crt_time = re.sub(r'\s+', ' ', html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_crt_time.group(1)))).strip() if m_crt_time else ""
 
-        m_crt_by = re.search(r'Người tạo.*?<td[^>]*class=["\']fieldValue[^"\']*["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
-        crt_by = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_crt_by.group(1)).strip()) if m_crt_by else ""
+        m_crt_by = re.search(r'id=["\']HelpDesk_detailView_fieldValue_created_user_id["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL) or re.search(r'Người tạo.*?<td[^>]*class=["\']fieldValue[^"\']*["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
+        crt_by = re.sub(r'\s+', ' ', html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_crt_by.group(1)))).strip() if m_crt_by else ""
 
         m_phones = re.findall(r'(?:0|\+84)\d{9,10}', desc)
         phone = m_phones[0] if m_phones else ""
+        if not phone and contact_raw:
+            m_cid = re.search(r'module=Contacts&(?:amp;)?view=Detail&(?:amp;)?record=(\d+)', contact_raw)
+            if m_cid:
+                try:
+                    kyc_res = crm_api.get_kyc_data("Contacts", m_cid.group(1))
+                    if kyc_res.get("success") and kyc_res.get("result"):
+                        phone = (kyc_res["result"].get("phone_not_hiden") or kyc_res["result"].get("phone") or "").strip()
+                except Exception:
+                    pass
 
         return {
             "record_id": rid,
@@ -148,6 +170,7 @@ def get_ticket_detail(rid: str, headers=None) -> dict:
             "retailer_id": ret,
             "phone": phone,
             "title": title,
+            "priority": priority,
             "desc": desc,
             "created_time": crt_time,
             "created_by": crt_by,
@@ -172,6 +195,13 @@ def send_gchat_renew(ticket_info: dict, dry_run=False) -> bool:
 
         phone_str = f"• **SĐT**: `{ticket_info['phone']}`\n" if ticket_info.get("phone") else ""
         customer_str = f"• **Khách hàng**: {ticket_info['contact']}\n" if ticket_info.get("contact") else ""
+        prio_val = (ticket_info.get("priority") or "").strip()
+        prio_str = ""
+        if prio_val:
+            if "urgent" in prio_val.lower():
+                prio_str = "• **Mức độ ưu tiên**: 🔴 *Urgent (Khẩn cấp)*\n"
+            elif "high" in prio_val.lower():
+                prio_str = "• **Mức độ ưu tiên**: 🟠 *High (Cao)*\n"
         desc_clean = (ticket_info.get("desc") or "").strip()
         if len(desc_clean) > 800:
             desc_clean = desc_clean[:800] + "... (xem tiếp trên CRM)"
@@ -184,6 +214,7 @@ def send_gchat_renew(ticket_info: dict, dry_run=False) -> bool:
             f"{customer_str}"
             f"• **Người tạo**: *{ticket_info['created_by']}*\n"
             f"• **Thời gian tạo**: `{ticket_info['created_time']}`\n"
+            f"{prio_str}"
             f"• **Tiêu đề**: *{ticket_info['title']}*\n"
             f"{phone_str}"
             f"• **Mô tả (Description)**:\n{desc_clean}\n\n"
@@ -209,6 +240,17 @@ def send_gchat_renew(ticket_info: dict, dry_run=False) -> bool:
         print(f"⚠️ [SC Renew] Lỗi gửi Google Chat: {e}", flush=True)
         return False
 
+def extract_listview_row_ids(html_text: str) -> list:
+    """
+    Bóc tách danh sách Record ID từ mọi dòng tr.listViewEntries (kể cả row-urgent hoặc thêm class CSS).
+    """
+    if not html_text:
+        return []
+    return re.findall(
+        r'<tr\b(?=[^>]*\bclass=["\'][^"\']*\blistViewEntries\b[^"\']*["\'])(?=[^>]*\bdata-id=["\'](\d+)["\'])[^>]*>',
+        html_text
+    )
+
 def scan_and_notify_sc_renew(is_warmup=False) -> int:
     """
     Quét View 20322 tìm Ticket mới từ Team Tái Ký và gửi thông báo.
@@ -216,7 +258,7 @@ def scan_and_notify_sc_renew(is_warmup=False) -> int:
     Trả về số lượng ticket mới đã được thông báo.
     """
     headers = get_headers()
-    url_view = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322"
+    url_view = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322&search_params=%5B%5D"
     
     seen_ids = load_seen_tickets()
     current_ids = []
@@ -228,7 +270,7 @@ def scan_and_notify_sc_renew(is_warmup=False) -> int:
         try:
             with urllib.request.urlopen(req, timeout=10) as resp:
                 p_html = resp.read().decode('utf-8', errors='ignore')
-            matches = re.findall(r'<tr[^>]+class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>', p_html)
+            matches = extract_listview_row_ids(p_html)
             if not matches:
                 break
             for mid in matches:
@@ -296,11 +338,11 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].lower() in ["test", "dry", "check"]:
         print("🔍 Đang chạy kiểm tra quét thử Ticket SC Group Tái Ký...")
         headers = get_headers()
-        url_view = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322"
+        url_view = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322&search_params=%5B%5D"
         req = urllib.request.Request(url_view, headers=headers)
         with urllib.request.urlopen(req, timeout=10) as resp:
             p_html = resp.read().decode('utf-8', errors='ignore')
-        matches = re.findall(r'<tr[^>]+class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>', p_html)
+        matches = extract_listview_row_ids(p_html)
         print(f"Tìm thấy {len(matches)} ticket trong SC Group.")
         for mid in matches:
             dt = get_ticket_detail(mid, headers)

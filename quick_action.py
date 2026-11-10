@@ -78,7 +78,7 @@ def resolve_record_id(query):
     cookie_str = headers.get("cookie", "")
     
     def extract_entry_id(html_text):
-        rows = re.findall(r'<tr[^>]*class=["\'][\w\s]*listViewEntries[\w\s]*["\'][^>]*>.*?</tr>', html_text, re.DOTALL)
+        rows = re.findall(r'<tr[^>]*class=["\'][^"\']*\blistViewEntries\b[^"\']*["\'][^>]*>.*?</tr>', html_text, re.DOTALL)
         for r in rows:
             m = re.search(r'data-id=["\'](\d+)["\']', r) or re.search(r'record=(\d+)', r)
             if m:
@@ -89,16 +89,17 @@ def resolve_record_id(query):
     if "TT" in query_str.upper():
         m_code = re.search(r'TT\d+', query_str, re.IGNORECASE)
         code = m_code.group(0).upper() if m_code else query_str
-        url = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&search_params=" + urllib.parse.quote(f'[[["ticket_no","c","{code}"]]]')
-        try:
-            req = urllib.request.Request(url, headers={"cookie": cookie_str, "user-agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, timeout=8) as resp:
-                html = resp.read().decode('utf-8', errors='ignore')
-            rec_id = extract_entry_id(html)
-            if rec_id:
-                return rec_id
-        except Exception:
-            pass
+        for vn_param in ["&viewname=19320", ""]:
+            url = f"https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List{vn_param}&search_params=" + urllib.parse.quote(f'[[["ticket_no","c","{code}"]]]')
+            try:
+                req = urllib.request.Request(url, headers={"cookie": cookie_str, "user-agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req, timeout=8) as resp:
+                    html = resp.read().decode('utf-8', errors='ignore')
+                rec_id = extract_entry_id(html)
+                if rec_id:
+                    return rec_id
+            except Exception:
+                pass
 
     # 2. Number string (Retailer ID or Record ID)
     if query_str.isdigit():
@@ -177,8 +178,11 @@ def extract_list_entry_ids(html_text):
     """
     if not html_text:
         return []
-    # 1. Match from <tr class="listViewEntries" data-id="...">
-    tr_matches = re.findall(r'<tr[^>]*class=["\'][\w\s]*listViewEntries[\w\s]*["\'][^>]*data-id=["\'](\d{6,})["\']', html_text)
+    # 1. Match from <tr class="listViewEntries..." data-id="...">
+    tr_matches = re.findall(
+        r'<tr\b(?=[^>]*\bclass=["\'][^"\']*\blistViewEntries\b[^"\']*["\'])(?=[^>]*\bdata-id=["\'](\d{6,})["\'])[^>]*>',
+        html_text
+    )
     if tr_matches:
         return list(dict.fromkeys(tr_matches))
         
@@ -1159,11 +1163,11 @@ def do_check_tickets(viewname="17811", is_gchat=False):
 
     team_tickets = []
     for page in range(1, 10):
-        url = f"https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=17811&page={page}"
+        url = f"https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=17811&search_params=%5B%5D&page={page}"
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=10) as resp:
             h = resp.read().decode('utf-8', errors='ignore')
-        rows = re.findall(r'<tr[^>]+class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>(.*?)</tr>', h, re.DOTALL)
+        rows = re.findall(r'<tr\b(?=[^>]*\bclass=["\'][^"\']*\blistViewEntries\b[^"\']*["\'])(?=[^>]*\bdata-id=["\'](\d+)["\'])[^>]*>(.*?)</tr>', h, re.DOTALL)
         if not rows:
             break
         for rec_id, row_html in rows:
@@ -1228,11 +1232,11 @@ def do_check_tickets(viewname="17811", is_gchat=False):
 
     unassigned_tickets = []
     for page in range(1, 10):
-        url = f"https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322&page={page}"
+        url = f"https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322&search_params=%5B%5D&page={page}"
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=10) as resp:
             h = resp.read().decode('utf-8', errors='ignore')
-        rows = re.findall(r'<tr[^>]+class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>(.*?)</tr>', h, re.DOTALL)
+        rows = re.findall(r'<tr\b(?=[^>]*\bclass=["\'][^"\']*\blistViewEntries\b[^"\']*["\'])(?=[^>]*\bdata-id=["\'](\d+)["\'])[^>]*>(.*?)</tr>', h, re.DOTALL)
         if not rows:
             break
         for rec_id, row_html in rows:
@@ -1386,7 +1390,7 @@ def do_check_sc_group(full_desc=False):
     Scans View 20322 ('SC group treo') and returns a formatted report with Creator (Người tạo), Store, Retailer, Phone, Title, Time, Owner, and Description.
     """
     headers = get_headers()
-    url_view = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322"
+    url_view = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322&search_params=%5B%5D"
     
     rec_ids = []
     for page in range(1, 10):
@@ -1395,7 +1399,7 @@ def do_check_sc_group(full_desc=False):
         try:
             with urllib.request.urlopen(req, timeout=10) as resp:
                 p_html = resp.read().decode('utf-8', errors='ignore')
-            matches = re.findall(r'<tr[^>]+class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>', p_html)
+            matches = re.findall(r'<tr\b(?=[^>]*\bclass=["\'][^"\']*\blistViewEntries\b[^"\']*["\'])(?=[^>]*\bdata-id=["\'](\d+)["\'])[^>]*>', p_html)
             if not matches:
                 break
             for mid in matches:
@@ -1426,7 +1430,8 @@ def do_check_sc_group(full_desc=False):
                     store = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_sp.group(1) if m_sp else m_cf_web.group(1))).strip()
             
             m_contact = re.search(r'id=["\']HelpDesk_detailView_fieldValue_contact_id["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
-            contact = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_contact.group(1)).strip()) if m_contact else ""
+            contact_raw = m_contact.group(1) if m_contact else ""
+            contact = re.sub(r'\s+', ' ', html_lib.unescape(re.sub(r'<[^>]+>', ' ', contact_raw))).strip() if m_contact else ""
             if not store: store = contact
             
             m_ret = re.search(r'id=["\']HelpDesk_detailView_fieldValue_retailer_id["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
@@ -1434,6 +1439,8 @@ def do_check_sc_group(full_desc=False):
             
             m_title = re.search(r'id=["\']HelpDesk_detailView_fieldValue_ticket_title["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
             title = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_title.group(1)).strip()) if m_title else ""
+
+            priority = extract_clean_field_value(dt_html, "ticketpriorities")
 
             m_desc = re.search(r'id=["\']HelpDesk_detailView_fieldValue_description["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
             if m_desc:
@@ -1445,14 +1452,27 @@ def do_check_sc_group(full_desc=False):
             else:
                 desc = ""
 
-            m_crt_time = re.search(r'Thời gian tạo.*?<td[^>]*class=["\']fieldValue[^"\']*["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
-            crt_time = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_crt_time.group(1)).strip()) if m_crt_time else ""
+            crt_time = extract_clean_field_value(dt_html, "createdtime")
+            if not crt_time:
+                m_crt_time = re.search(r'Thời gian tạo.*?<td[^>]*class=["\']fieldValue[^"\']*["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
+                crt_time = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_crt_time.group(1)).strip()) if m_crt_time else ""
 
-            m_crt_by = re.search(r'Người tạo.*?<td[^>]*class=["\']fieldValue[^"\']*["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
-            crt_by = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_crt_by.group(1)).strip()) if m_crt_by else ""
+            crt_by = extract_clean_field_value(dt_html, "created_user_id")
+            if not crt_by:
+                m_crt_by = re.search(r'Người tạo.*?<td[^>]*class=["\']fieldValue[^"\']*["\'][^>]*>(.*?)</td>', dt_html, re.DOTALL)
+                crt_by = html_lib.unescape(re.sub(r'<[^>]+>', ' ', m_crt_by.group(1)).strip()) if m_crt_by else ""
 
             m_phones = re.findall(r'(?:0|\+84)\d{9,10}', desc)
             phone = m_phones[0] if m_phones else ""
+            if not phone and contact_raw:
+                m_cid = re.search(r'module=Contacts&(?:amp;)?view=Detail&(?:amp;)?record=(\d+)', contact_raw)
+                if m_cid:
+                    try:
+                        kyc_res = crm_api.get_kyc_data("Contacts", m_cid.group(1))
+                        if kyc_res.get("success") and kyc_res.get("result"):
+                            phone = (kyc_res["result"].get("phone_not_hiden") or kyc_res["result"].get("phone") or "").strip()
+                    except Exception:
+                        pass
 
             return {
                 "record_id": rid,
@@ -1462,6 +1482,7 @@ def do_check_sc_group(full_desc=False):
                 "retailer_id": ret,
                 "phone": phone,
                 "title": title,
+                "priority": priority,
                 "desc": desc,
                 "created_time": crt_time,
                 "created_by": crt_by,
@@ -1479,6 +1500,7 @@ def do_check_sc_group(full_desc=False):
     ]
     for i, d in enumerate(details, 1):
         phone_str = f" | **SĐT**: `{d['phone']}`" if d['phone'] else ""
+        prio_str = f" *(🔴 {d['priority']})*" if d.get("priority") and "urgent" in d["priority"].lower() else ""
         if full_desc:
             desc_formatted = "\n".join(f"     > {line}" for line in d['desc'].splitlines() if line.strip())
             desc_block = f"   • **Mô tả chi tiết**:\n{desc_formatted}\n"
@@ -1488,7 +1510,7 @@ def do_check_sc_group(full_desc=False):
             desc_block = f"   • **Mô tả**: `{desc_short}`\n"
 
         lines.append(
-            f"{i}. 🎫 `{d['ticket_no']}` — [Link CRM]({d['crm_url']})\n"
+            f"{i}. 🎫 `{d['ticket_no']}`{prio_str} — [Link CRM]({d['crm_url']})\n"
             f"   • **Tên GH**: `{d['store']}` *(Retailer ID: `{d['retailer_id']}`)*\n"
             f"   • **Khách hàng**: {d['contact']}{phone_str}\n"
             f"   • **Người tạo**: **{d['created_by']}**\n"
@@ -2348,89 +2370,82 @@ def do_check_phone(phone_query, target_staff=None):
 
 def do_check_single_ticket(ticket_query):
     """
-    Super-fast lookup for a single HelpDesk Ticket by ticket_no (e.g. TT8883164 or 8883164).
+    Super-fast lookup for a single HelpDesk Ticket by ticket_no (e.g. TT8883164 or 8883164) or record ID.
     Returns formatted Markdown details including store, owner, description, and ModComments.
     """
     headers = get_headers()
-    cookie_str = headers.get("cookie", "")
     t_q = str(ticket_query).strip()
-    
-    url_search = f"https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&search_params=" + urllib.parse.quote(f'[[["ticket_no","c","{t_q}"]]]')
-    try:
-        with urllib.request.urlopen(urllib.request.Request(url_search, headers=headers), timeout=8) as resp:
-            h = resp.read().decode('utf-8', errors='ignore')
-    except Exception as e:
-        return f"Lỗi kết nối CRM: {e}"
-        
-    m = re.search(r'<tr[^>]+class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>(.*?)</tr>', h, re.DOTALL)
-    if not m:
-        url_global = f"https://kvcrm.kiotviet.vn/index.php?module=Home&view=UnifiedSearch&query={t_q}"
+    rec_id = None
+
+    # 1. Search HelpDesk ListView (View 19320 = ALL SEARCH TK so session view doesn't filter out tickets)
+    for vn_param in ["&viewname=19320", ""]:
+        url_search = f"https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List{vn_param}&search_params=" + urllib.parse.quote(f'[[["ticket_no","c","{t_q}"]]]')
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url_search, headers=headers), timeout=8) as resp:
+                h = resp.read().decode('utf-8', errors='ignore')
+            ids = re.findall(
+                r'<tr\b(?=[^>]*\bclass=["\'][^"\']*\blistViewEntries\b[^"\']*["\'])(?=[^>]*\bdata-id=["\'](\d+)["\'])[^>]*>',
+                h
+            )
+            if ids:
+                rec_id = ids[0]
+                break
+        except Exception as e:
+            if not vn_param:
+                return f"Lỗi kết nối CRM: {e}"
+
+    # 2. Fallback to BasicAjax global search
+    if not rec_id:
+        url_global = f"https://kvcrm.kiotviet.vn/index.php?module=Vtiger&view=BasicAjax&mode=showSearchResults&value={urllib.parse.quote(t_q)}&searchModule=HelpDesk"
         try:
             with urllib.request.urlopen(urllib.request.Request(url_global, headers=headers), timeout=8) as resp2:
                 h2 = resp2.read().decode('utf-8', errors='ignore')
-            m = re.search(r'<tr[^>]+class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>(.*?)</tr>', h2, re.DOTALL)
+            m_g = re.search(r'data-crmid=["\'](\d+)["\']', h2) or re.search(
+                r'<tr\b(?=[^>]*\bclass=["\'][^"\']*\blistViewEntries\b[^"\']*["\'])(?=[^>]*\bdata-id=["\'](\d+)["\'])[^>]*>',
+                h2
+            )
+            if m_g:
+                rec_id = m_g.group(1)
         except Exception:
             pass
 
-    if not m:
+    # 3. Direct HelpDesk record ID fallback
+    if not rec_id and t_q.isdigit() and len(t_q) >= 8:
+        rec_id = t_q
+
+    if not rec_id:
         return f"❌ Không tìm thấy Ticket `{t_q}` trên CRM."
 
-    rec_id, row_html = m.groups()
-    cells = re.findall(r'<td[^>]*>(.*?)</td>', row_html, re.DOTALL)
-    
-    t_no = html_lib.unescape(re.sub(r'<[^>]+>', ' ', cells[1])).strip() if len(cells) > 1 else t_q
-    title = html_lib.unescape(re.sub(r'<[^>]+>', ' ', cells[2])).strip() if len(cells) > 2 else ""
-    created_time = html_lib.unescape(re.sub(r'<[^>]+>', ' ', cells[10])).strip() if len(cells) > 10 else ""
-    status = html_lib.unescape(re.sub(r'<[^>]+>', ' ', cells[4])).strip() if len(cells) > 4 else ""
-    owner = html_lib.unescape(re.sub(r'<[^>]+>', ' ', cells[7])).strip() if len(cells) > 7 else ""
-    desc = html_lib.unescape(re.sub(r'<[^>]+>', ' ', cells[8])).strip() if len(cells) > 8 else ""
-    creator = html_lib.unescape(re.sub(r'<[^>]+>', ' ', cells[9])).strip() if len(cells) > 9 else ""
-    
     detail_url = f"https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=Detail&record={rec_id}"
-    store_name = ""
-    retailer_id = ""
-    contact_name = ""
-    full_desc = desc
-    priority = ""
-    
     try:
-        with urllib.request.urlopen(urllib.request.Request(detail_url, headers=headers), timeout=8) as r_det:
+        with urllib.request.urlopen(urllib.request.Request(detail_url, headers=headers), timeout=10) as r_det:
             h_det = r_det.read().decode('utf-8', errors='ignore')
-        
-        rows_det = re.findall(r'<td[^>]*class=["\']fieldLabel[^>]*>(.*?)</td>\s*<td[^>]*class=["\']fieldValue[^>]*>(.*?)</td>', h_det, re.DOTALL)
-        for lbl, val in rows_det:
-            l_clean = html_lib.unescape(re.sub(r'<[^>]+>', ' ', lbl)).strip().lower()
-            v_clean = html_lib.unescape(re.sub(r'<[^>]+>', ' ', val)).strip()
-            if "select an option" in v_clean.lower():
-                v_clean = re.split(r'select an option', v_clean, flags=re.IGNORECASE)[0].strip()
-            if "tên gian hàng" in l_clean or "website" in l_clean:
-                store_name = v_clean
-                if store_name:
-                    store_name = store_name.strip().splitlines()[0].strip()
-                    if " " in store_name:
-                        first_tok = store_name.split()[0].strip()
-                        if first_tok.lower() in store_name.lower():
-                            store_name = first_tok
-            elif "retailer id" in l_clean:
-                retailer_id = v_clean
-            elif "khách hàng" in l_clean or "contact" in l_clean:
-                contact_name = v_clean
-            elif "mô tả" in l_clean or "description" in l_clean:
-                full_desc = v_clean
-            elif "ưu tiên" in l_clean or "priority" in l_clean:
-                priority = v_clean
-            elif "người tạo" in l_clean:
-                creator = v_clean
-            elif "thời gian tạo" in l_clean:
-                created_time = v_clean
-            elif "người xử lý" in l_clean:
-                owner = v_clean
-            elif "trạng thái" in l_clean:
-                status = v_clean
-            elif "tiêu đề" in l_clean:
-                title = v_clean
-    except Exception:
-        pass
+    except Exception as e:
+        return f"Lỗi tải chi tiết Ticket `{t_q}`: {e}"
+
+    t_no = extract_clean_field_value(h_det, "ticket_no") or t_q
+    if not t_no or t_no == t_q and "HelpDesk_detailView_fieldValue_ticket_no" not in h_det:
+        return f"❌ Không tìm thấy Ticket `{t_q}` trên CRM."
+
+    title = extract_clean_field_value(h_det, "ticket_title")
+    status = extract_clean_field_value(h_det, "ticketstatus")
+    owner = extract_clean_field_value(h_det, "assigned_user_id")
+    creator = extract_clean_field_value(h_det, "created_user_id")
+    created_time = extract_clean_field_value(h_det, "createdtime")
+    priority = extract_clean_field_value(h_det, "ticketpriorities") or "Normal"
+    store_name = extract_clean_field_value(h_det, "cf_website")
+    retailer_id = extract_clean_field_value(h_det, "retailer_id")
+    contact_name = extract_clean_field_value(h_det, "contact_id")
+
+    m_desc = re.search(r'id=["\']HelpDesk_detailView_fieldValue_description["\'][^>]*>(.*?)</td>', h_det, re.DOTALL)
+    if m_desc:
+        raw_desc = m_desc.group(1)
+        raw_desc = re.sub(r'<br\s*/?>', '\n', raw_desc, flags=re.I)
+        raw_desc = re.sub(r'</p>|</div>', '\n', raw_desc, flags=re.I)
+        full_desc = html_lib.unescape(re.sub(r'<[^>]+>', '', raw_desc)).strip()
+        full_desc = re.sub(r'\n{3,}', '\n\n', full_desc)
+    else:
+        full_desc = extract_clean_field_value(h_det, "description")
 
     comments = []
     comments_url = f"https://kvcrm.kiotviet.vn/index.php?module=ModComments&view=DetailAjax&record={rec_id}&relatedModule=HelpDesk&mode=showRelatedList"
@@ -2751,11 +2766,11 @@ if __name__ == '__main__':
         if len(args) > 1 and args[1].lower() in ["send", "test"]:
             print("🚀 Đang kiểm tra và gửi thử thông báo Ticket Tái Ký lên Google Chat...")
             headers = sc_renew_monitor.get_headers()
-            url_view = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322"
+            url_view = "https://kvcrm.kiotviet.vn/index.php?module=HelpDesk&view=List&viewname=20322&search_params=%5B%5D"
             req = urllib.request.Request(url_view, headers=headers)
             with urllib.request.urlopen(req, timeout=10) as resp:
                 p_html = resp.read().decode('utf-8', errors='ignore')
-            matches = re.findall(r'<tr[^>]+class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>', p_html)
+            matches = sc_renew_monitor.extract_listview_row_ids(p_html)
             found = False
             for mid in matches:
                 dt = sc_renew_monitor.get_ticket_detail(mid, headers)

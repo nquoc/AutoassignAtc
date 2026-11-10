@@ -49,7 +49,7 @@ def query_atcs_view_17629(start_date, end_date):
         try:
             with urllib.request.urlopen(req, timeout=12) as resp:
                 content = resp.read().decode('utf-8', errors='ignore')
-            matches = re.findall(r'<tr[^>]*class=["\']listViewEntries["\'][^>]*data-id=["\'](\d+)["\'][^>]*>', content)
+            matches = re.findall(r'<tr\b(?=[^>]*\bclass=["\'][^"\']*\blistViewEntries\b[^"\']*["\'])(?=[^>]*\bdata-id=["\'](\d+)["\'])[^>]*>', content)
             new_ids = [m for m in matches if m not in all_ids]
             if not new_ids:
                 break
