@@ -288,14 +288,14 @@ def send_welcome(message):
         "  _Ví dụ_: `cto 1,2 all 8460` hoặc `cto 1,2,3 5 8460` hoặc `chia cto 1,2 cho 8460`\n"
         "• Chia tỉnh: `[ID viết tắt] [Số lượng] [Mã nhân sự]` (Ví dụ: `danang 2 8421`)\n\n"
         "👉 **3. Tự động chia data (< 10 ATC treo):**\n"
-        "• Tự động quét 2 lần/ngày: **08:30 sáng** & **20:30 tối** (đẩy thêm 8 data)\n"
+        "• Tự động quét 2 lần/ngày: **06:30 sáng** & **18:20 tối** (đẩy thêm 8 data)\n"
         "• Kiểm tra mô phỏng trước: `/checkauto` hoặc `check chia`\n"
         "• Chạy chia ngay lập tức: `/autoassign` hoặc `chiatudong`\n\n"
         "👉 **4. Báo cáo & Giám sát:**\n"
         "• Báo cáo Coacher Quốc: `/checkquoc`\n"
         "• Cảnh báo trễ SLA: `/sla`\n"
         "• Báo cáo Google Chat: `/report`\n"
-        "• Cập nhật Google Sheet Miền Nam (21h tự động): `/updatesheet` hoặc `/sheet`"
+        "• Cập nhật Google Sheet Miền Nam (18h30 tự động): `/updatesheet` hoặc `/sheet`"
     )
     bot.send_message(message.chat.id, welcome_text, parse_mode="Markdown")
 
@@ -3586,7 +3586,7 @@ def resolve_ward_names(ward_str, cached_wards):
 def handle_text(message):
     text = message.text.strip()
 
-    # Lưu chat_id mới nhất để gửi thông báo tự động (06:30 & 20:30)
+    # Lưu chat_id mới nhất để gửi thông báo tự động (06:30 & 18:20)
     try:
         last_chat_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "last_chat_id.txt")
         with open(last_chat_file, "w", encoding="utf-8") as f:
@@ -4207,39 +4207,39 @@ if __name__ == "__main__":
                     except Exception as e:
                         print(f"❌ [Scheduler] Lỗi gửi báo cáo 18:00: {e}")
 
-                # 20:00 PM Ticket Treo Report (tag đích danh)
-                if "20:00" <= now_str < "22:30" and state.get("reported_today_20h") != today_str:
-                    state["reported_today_20h"] = today_str
+                # 18:10 PM Ticket Treo Report (tag đích danh)
+                if "18:10" <= now_str < "22:30" and state.get("reported_today_18h10") != today_str:
+                    state["reported_today_18h10"] = today_str
                     save_scheduler_state(state)
-                    print(f"⏰ [Scheduler] Bắt đầu bắn báo cáo Ticket treo 20:00 lên Google Chat lúc {now_str}...")
+                    print(f"⏰ [Scheduler] Bắt đầu bắn báo cáo Ticket treo 18:10 lên Google Chat lúc {now_str}...")
                     try:
                         import quick_action
                         success, res_msg = quick_action.do_send_ticket_gchat()
                         if success:
-                            print(f"🎉 [Scheduler] Báo cáo Ticket treo 20:00 ngày {today_str} đã gửi Google Chat thành công!")
+                            print(f"🎉 [Scheduler] Báo cáo Ticket treo 18:10 ngày {today_str} đã gửi Google Chat thành công!")
                         else:
-                            print(f"❌ [Scheduler] Báo cáo Ticket treo 20:00 thất bại: {res_msg}")
+                            print(f"❌ [Scheduler] Báo cáo Ticket treo 18:10 thất bại: {res_msg}")
                     except Exception as e:
-                        print(f"❌ [Scheduler] Lỗi báo cáo Ticket treo 20:00: {e}")
+                        print(f"❌ [Scheduler] Lỗi báo cáo Ticket treo 18:10: {e}")
 
-                # 20:30 PM Auto-assign (< 10 ATC treo -> Đẩy thêm 8 data)
-                if "20:30" <= now_str < "23:00" and state.get("auto_assigned_today_20h30") != today_str:
-                    state["auto_assigned_today_20h30"] = today_str
+                # 18:20 PM Auto-assign (< 10 ATC treo -> Đẩy thêm 8 data)
+                if "18:20" <= now_str < "23:00" and state.get("auto_assigned_today_18h20") != today_str:
+                    state["auto_assigned_today_18h20"] = today_str
                     save_scheduler_state(state)
-                    print(f"⏰ [Scheduler] Bắt đầu tự động quét & chia data 20:30 (< 10 ATC) lúc {now_str}...")
+                    print(f"⏰ [Scheduler] Bắt đầu tự động quét & chia data 18:20 (< 10 ATC) lúc {now_str}...")
                     try:
                         import quick_action
                         success, r_msg, _ = quick_action.do_auto_assign_under_10(batch_size=8, threshold=10, dry_run=False)
                         send_auto_assign_notification(r_msg)
-                        print(f"🎉 [Scheduler] Đã hoàn thành tự động chia data 20:30 tối ngày {today_str}!")
+                        print(f"🎉 [Scheduler] Đã hoàn thành tự động chia data 18:20 tối ngày {today_str}!")
                     except Exception as e:
-                        print(f"❌ [Scheduler] Lỗi chia data 20:30: {e}")
+                        print(f"❌ [Scheduler] Lỗi chia data 18:20: {e}")
 
-                # 21:00 PM Auto-update Google Sheet Miền Nam (Sau khi auto-assign 20h30 xong)
-                if "21:00" <= now_str <= "23:59" and state.get("auto_sheet_updated_today_21h") != today_str:
-                    state["auto_sheet_updated_today_21h"] = today_str
+                # 18:30 PM Auto-update Google Sheet Miền Nam (Sau khi auto-assign 18h20 xong)
+                if "18:30" <= now_str <= "23:59" and state.get("auto_sheet_updated_today_18h30") != today_str:
+                    state["auto_sheet_updated_today_18h30"] = today_str
                     save_scheduler_state(state)
-                    print(f"⏰ [Scheduler] Bắt đầu tự động cập nhật Google Sheet Miền Nam lúc {now_str} (Hẹn giờ 21:00)...")
+                    print(f"⏰ [Scheduler] Bắt đầu tự động cập nhật Google Sheet Miền Nam lúc {now_str} (Hẹn giờ 18:30)...")
                     try:
                         import auto_sheet_updater
                         saved_chat_id = None
@@ -4263,7 +4263,7 @@ if __name__ == "__main__":
             time.sleep(30)
 
     threading.Thread(target=daily_report_scheduler, daemon=True).start()
-    print("⏰ Đã kích hoạt bộ đếm thời gian gửi báo cáo tự động (06h30 Chia data, 07h00 SLA, 18h00 Báo cáo ngày, 20h00 Ticket treo, 20h30 Chia data & 21h00 Update Sheet).")
+    print("⏰ Đã kích hoạt bộ đếm thời gian gửi báo cáo tự động (06h30 Chia data, 07h00 SLA, 18h00 Báo cáo ngày, 18h10 Ticket treo, 18h20 Chia data & 18h30 Update Sheet).")
 
     def crm_keep_alive_daemon():
         time.sleep(10)

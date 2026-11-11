@@ -9,10 +9,10 @@ Hệ thống Bot Telegram tự động hóa điều phối, phân công data ATC
    - Cơ chế bảo vệ và kiểm tra trạng thái đơn trước khi chuyển giao.
 
 2. **Tự động phân công (< 10 ATC treo):**
-   - Bộ đếm thời gian tự động quét và phân chia thêm data vào các khung giờ: `06:30` sáng và `20:30` tối.
+   - Bộ đếm thời gian tự động quét và phân chia thêm data vào các khung giờ: `06:30` sáng và `18:20` tối.
    - Hỗ trợ chạy mô phỏng dry-run (`/checkauto`) và phân công ngay lập tức (`/autoassign`).
 
-3. **Tự động cập nhật Google Sheet Miền Nam (21:00 hàng ngày):**
+3. **Tự động cập nhật Google Sheet Miền Nam (18:30 hàng ngày):**
    - Quét trực tiếp dữ liệu tồn và số lượng ATC đang giữ của nhân sự trên CRM.
    - Tự động tính Tổng tải (`ATC + Tồn`) và phân bổ theo 5 tầng tải (Tier 0 – Tier 4).
    - Bảo toàn các tuyến tỉnh cố định (Vũng Tàu, Đồng Nai) và cập nhật động các tuyến Hồ Chí Minh từ dòng 52.
@@ -21,7 +21,7 @@ Hệ thống Bot Telegram tự động hóa điều phối, phân công data ATC
 4. **Báo cáo & Giám sát SLA:**
    - Gửi báo cáo cảnh báo trễ hạn SLA (≥ 10 ngày) lên Google Chat Space lúc `07:00` sáng (`/sla`).
    - Tổng hợp và gửi báo cáo tiến độ ngày lên Google Chat lúc `18:00` tối (`/report`).
-   - Báo cáo danh sách Ticket treo đích danh lúc `20:00` tối (`/checktk`).
+   - Báo cáo danh sách Ticket treo đích danh lúc `18:10` tối (`/checktk`).
 
 5. **Duy trì phiên đăng nhập CRM 24/7 (Keep-Alive Daemon):**
    - Luồng chạy ngầm liên tục kiểm tra cookie phiên CRM.

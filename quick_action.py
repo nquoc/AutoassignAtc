@@ -730,7 +730,7 @@ def do_assign_region(region_name_or_id, quantity, staff_code, ward_filter=None):
 def do_auto_assign_under_10(batch_size=8, threshold=10, dry_run=False, log_callback=None):
     """
     Tự động quét View 20154 và phân công thêm data (mặc định 8 data) cho nhân sự team Coacher Quốc đang giữ < 10 data.
-    Khung giờ quét định kỳ: 06:30 sáng và 20:30 tối.
+    Khung giờ quét định kỳ: 06:30 sáng và 18:20 tối.
     Quy tắc phân bổ & ưu tiên khu vực:
       - 8460 (Hiển): Ưu tiên lấy từ kho Cà Mau (Camau) trước. Nếu Cà Mau thiếu, lấy bù từ Cần Thơ (Cantho).
       - 8470 (Đạo): Ưu tiên lấy từ kho Sóc Trăng (Soctrang) trước. Nếu Sóc Trăng thiếu, lấy bù từ Cần Thơ (Cantho).
