@@ -46,22 +46,20 @@
         "Tam Thắng",
         "Vũng Tàu",
         "Rạch Dừa",
-        "Phước Thắng"
+        "Phước Thắng",
+        "Bà Rịa"
       ]
     },
     "dong_nai": {
       "city": "Đồng Nai",
       "assignee": "8437 - Nguyễn Đoàn Hưng Phát",
       "wards": [
-        "Biên Hòa",
         "Hố Nai",
         "Trấn Biên",
         "Tam Hiệp",
         "Trảng Bom",
-        "Trảng Dài",
-        "Long Bình",
-        "Tân Triều",
-        "Bình Minh"
+        "Bình Minh",
+        "Biên Hòa"
       ]
     }
   },
